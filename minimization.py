@@ -1,7 +1,7 @@
 import sys,os
 import numpy as np
 import cellconstructor as CC
-import cal_ensemble
+import sscha, sscha.Ensemble, sscha.SchaMinimizer, sscha.Relax
 
 def collect_data():
 	directory = "run_calculation"
@@ -57,7 +57,7 @@ def collect_data():
 	energy_file = os.path.join("data_ensemble_manual", "energies_supercell_population1.dat")
 	np.savetxt(energy_file, energies)
 
-def sscha(ensemble):
+def scha():
 	dyn = CC.Phonons.Phonons("harmonic_dyn", nqirr = 3)
 	dyn.Symmetrize()
 	dyn.ForcePositiveDefinite()
@@ -70,12 +70,12 @@ def sscha(ensemble):
 	minimizer.minim_struct = False
 
 	# Setup the minimization parameter for the covariance matrix
-	minimizer.min_step_dyn = 0.05 # Values around 1 are good
+	minimizer.min_step_dyn = 1 # Values around 1 are good
 	#minimizer.precond_dyn = False
 	#minimizer.root_representation = "root2"
 
 	# Setup the threshold for the ensemble wasting
-	minimizer.kong_liu_ratio = 0.3 # Usually 0.5 is a good value
+	minimizer.kong_liu_ratio = 0.5 # Usually 0.5 is a good value
 
 	# Lest start the minimization
 	minimizer.init()
@@ -84,6 +84,6 @@ def sscha(ensemble):
 
 if __name__ == "__main__":
 	collect_data()
-	min=sscha()
+	min=scha()
 	min.finalize()
 	
