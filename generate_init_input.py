@@ -4,12 +4,8 @@ from ase.visualize import view
 
 PbTe_atoms = ase.io.read("PbTe.cif")
 
-import initial_density_matrix
-from ensemble import *
-from dft_ensemble import *
-from minization import *
 from init_structure import *
-import config as cfg
+import config 
 
 
 
