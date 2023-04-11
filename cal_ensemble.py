@@ -3,6 +3,7 @@ import cellconstructor.Structure
 import cellconstructor.Phonons
 import sscha, sscha.Ensemble, sscha.SchaMinimizer, sscha.Relax
 import sys,os
+import config
 
 def generate_ensemble():
 	dyn = CC.Phonons.Phonons("harmonic_dyn", nqirr = config.nqirr)
