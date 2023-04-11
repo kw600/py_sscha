@@ -6,9 +6,9 @@ nqirr = 3 #number of irreducible q points
 T0 = 100
 
 #step1 initial relaxation
-ecutwfc = 60, # The plane-wave wave-function cutoff
-ecutrho = 240, # The density wave-function cutoff,
-conv_thr = 1e-6, # The convergence for the DFT self-consistency
+ecutwfc = 60 # The plane-wave wave-function cutoff
+ecutrho = 240 # The density wave-function cutoff,
+conv_thr = 1e-6 # The convergence for the DFT self-consistency
 k_spacing = 0.2 #A^-1 The minimum distance in the Brillouin zone sampling
 
 # configurations for DFT calculations
