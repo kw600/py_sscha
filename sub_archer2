@@ -16,5 +16,5 @@
 #SBATCH --time=01:0:0
 module load quantum_espresso
 module list
-srun --distribution=block:block --hint=nomultithread pw.x < espresso.pwi
-srun --distribution=block:block --hint=nomultithread ph.x < harmonic.phi
+srun --distribution=block:block --hint=nomultithread pw.x < espresso.pwi > espresso.pwo
+srun --distribution=block:block --hint=nomultithread ph.x < harmonic.phi > harmonic.pho
