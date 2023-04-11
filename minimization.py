@@ -8,10 +8,12 @@ def collect_data():
 	directory = "run_calculation"
 	output_filenames = [f for f in os.listdir(directory) if f.endswith(".pwo")] # We select only the output files
 	output_files = [os.path.join(directory, f) for f in output_filenames] # We add the directory/outpufilename to load them correctly
-
+	cou=1
 	# We prepare the array of energies
 	energies = np.zeros(len(output_files)) 
 	for file in output_files:
+		
+		
 		# Get the number of the configuration.
 		id_number = int(file.split("_")[-1].split(".")[0]) # The same as before, we need the to extract the configuration number from the filename
 		
@@ -22,8 +24,10 @@ def collect_data():
 		
 		# Lets look for the energy (in espresso the first line that starts with !)
 		# next is used to find only the first occurrence
-		energy_line = next(l for l in lines if len(l) > 0 if l.split()[0] == "!")
-		
+		try:
+			energy_line = next(l for l in lines if len(l) > 0 if l.split()[0] == "!")
+		else:
+			print("Error: no energy found in file {}".format(file))
 		# Lets collect the energy (the actual number is the 5th item on the line, but python indexes start from 0)
 		# note, also the id_number are saved starting from 1
 		energies[id_number - 1] = float(energy_line.split()[4])

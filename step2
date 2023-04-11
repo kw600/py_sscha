@@ -3,7 +3,8 @@ N=`grep 'N_config' config.py | awk '{print $NF}'`
 cd run_calculation
 cp -r ../pseudo_espresso ./
 cp ../sub_dft ./
-for i in `seq 1 $N`
+N1=$((N/4))
+for i in `seq 1 ${N1}`
 do
 sbatch sub_dft $i
 done
