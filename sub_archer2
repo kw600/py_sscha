@@ -1,0 +1,20 @@
+#!/bin/bash
+# 
+# Parallel script produced by bolt
+#        Resource: ARCHER2 (HPE Cray EX (128-core per node))
+#    Batch system: Slurm
+#
+# bolt is written by EPCC (http://www.epcc.ed.ac.uk)
+#
+#SBATCH --nodes=1
+#SBATCH --tasks-per-node=16
+#SBATCH --cpus-per-task=1
+#SBATCH --job-name=s1
+#SBATCH --account=e89-ic_m
+#SBATCH --partition=standard
+#SBATCH --qos=standard
+#SBATCH --time=01:0:0
+module load quantum_espresso
+module list
+srun --distribution=block:block --hint=nomultithread pw.x < espresso.pwi
+srun --distribution=block:block --hint=nomultithread ph.x < harmonic.phi

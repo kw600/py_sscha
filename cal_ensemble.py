@@ -1,0 +1,98 @@
+import cellconstructor as CC
+import cellconstructor.Structure
+import cellconstructor.Phonons
+import sscha, sscha.Ensemble, sscha.SchaMinimizer, sscha.Relax
+import sys,os
+
+def generate_ensemble():
+	dyn = CC.Phonons.Phonons("harmonic_dyn", nqirr = 3)
+
+	# Apply the sum rule and symmetries
+	dyn.Symmetrize()
+
+	# Flip the imaginary frequencies into real ones
+	dyn.ForcePositiveDefinite()
+        
+	ensemble = sscha.Ensemble.Ensemble(dyn, T0 = 100, supercell= dyn.GetSupercell())
+	# We generate 10 randomly displaced structures in the supercell
+	ensemble.generate(N = 10)
+
+	ensemble.save("data_ensemble_manual", population = 1)
+	return ensemble
+
+def generate_dft_input():
+	ensemble = generate_ensemble()
+	typical_espresso_header = """
+&control
+	calculation = "scf"
+	tstress = .true.
+	tprnfor = .true.
+	disk_io = "none"
+	pseudo_dir = "pseudo_espresso"
+&end
+&system
+	nat = {}
+	ntyp = 2
+	ibrav = 0
+	ecutwfc = 40
+	ecutrho = 160
+&end
+&electrons
+	conv_thr = 1d-6
+	!diagonalization = "cg"
+&end
+
+ATOMIC_SPECIES
+	Pb 207.2 Pb.upf
+	Te 127.6 Te.upf
+
+K_POINTS automatic
+1 1 1 0 0 0
+	""".format(ensemble.structures[0].N_atoms) 
+	# We extract the number of atoms form the ensemble and the celldm(1) from the dynamical matrix (it is stored in Angstrom, but espresso wants it in Bohr)
+	# You can also read it on the fourth value of the first data line on the first dynamical matrix file (dyn_start_popilation1_1); In the latter case, it will be already in Bohr.
+
+	# Now we need to read the scf files
+	all_scf_files = [os.path.join("data_ensemble_manual", f) for f in os.listdir("data_ensemble_manual") if f.startswith("scf_")]
+
+	# In the previous line  I am reading all the files inside data_ensemble_manual os.listdir(data_ensemble_manual) and iterating over them (the f variable)
+	# I iterate only on the filenames that starts with scf_ 
+	# Then I join the directory name data_ensemble_manual to f. In unix it will be equal to data_ensemble_manual/scf_....
+	# (using os.path.join to concatenate path assure to have the correct behaviour independently on the operating system
+
+	# We will generate the input file in a new directory
+	if not os.path.exists("run_calculation"):
+		os.mkdir("run_calculation")
+
+	for file in all_scf_files:
+		# Now we are cycling on the scf_ files we found.
+		# We must extract the number of the file
+		# The file is the string "data_ensemble_manual/scf_population1_X.dat"
+		# Therefore the X number is after the last "_" and before the "." character
+		# We can split before the string file at each "_", isolate the last part "X.dat"
+		# and then split it again on "." (obtaining ["X", "dat"]) and select the first element
+		# then we convert the "X" string into an integer
+		number = int(file.split("_")[-1].split(".")[0])
+		
+		# We decide the filename for the espresso input
+		# We will call it run_calculation/espresso_run_X.pwi
+		filename = os.path.join("run_calculation", "espresso_run_{}.pwi".format(number))
+		
+		# We start writing the file
+		with open(filename, "w") as f:
+			# We write the header
+			f.write(typical_espresso_header)
+			
+			# Load the scf_population_X.dat file
+			ff = open(file, "r")
+			structure_lines = ff.readlines()
+			ff.close()
+			
+			# Write the content on the espresso_run_X.pwi file
+			# Note in the files we specify the units for both the cell and the structure [Angstrom]
+			f.writelines(structure_lines)
+	return ensemble
+
+if __name__ == "__main__":
+    generate_dft_input()
+    
