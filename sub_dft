@@ -7,7 +7,7 @@
 # bolt is written by EPCC (http://www.epcc.ed.ac.uk)
 #
 #SBATCH --nodes=1
-#SBATCH --tasks-per-node=16
+#SBATCH --tasks-per-node=128
 #SBATCH --cpus-per-task=1
 #SBATCH --job-name=s1
 #SBATCH --account=e89-ic_m

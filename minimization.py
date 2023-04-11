@@ -2,6 +2,7 @@ import sys,os
 import numpy as np
 import cellconstructor as CC
 import sscha, sscha.Ensemble, sscha.SchaMinimizer, sscha.Relax
+import config
 
 def collect_data():
 	directory = "run_calculation"
@@ -58,24 +59,24 @@ def collect_data():
 	np.savetxt(energy_file, energies)
 
 def scha():
-	dyn = CC.Phonons.Phonons("harmonic_dyn", nqirr = 3)
+	dyn = CC.Phonons.Phonons("harmonic_dyn", nqirr = config.nqirr)
 	dyn.Symmetrize()
 	dyn.ForcePositiveDefinite()
-	ensemble = sscha.Ensemble.Ensemble(dyn, T0 = 100, supercell= dyn.GetSupercell())
-	ensemble.load("data_ensemble_manual", population = 1, N = 10)
-	ensemble.update_weights(dyn, 100) # Restore the original density matrix at T = 100 K
+	ensemble = sscha.Ensemble.Ensemble(dyn, T0 = config.T0, supercell= dyn.GetSupercell())
+	ensemble.load("data_ensemble_manual", population = config.population, N = config.N_config)
+	ensemble.update_weights(dyn, config.T0) # Restore the original density matrix at T = 100 K
 	minimizer = sscha.SchaMinimizer.SSCHA_Minimizer(ensemble)
 
 	# Ignore the structure minimization (is fixed by symmetry)
 	minimizer.minim_struct = False
 
 	# Setup the minimization parameter for the covariance matrix
-	minimizer.min_step_dyn = 1 # Values around 1 are good
+	minimizer.min_step_dyn = config.min_step_dyn # Values around 1 are good
 	#minimizer.precond_dyn = False
 	#minimizer.root_representation = "root2"
 
 	# Setup the threshold for the ensemble wasting
-	minimizer.kong_liu_ratio = 0.5 # Usually 0.5 is a good value
+	minimizer.kong_liu_ratio = config.kong_liu_ratio # Usually 0.5 is a good value
 
 	# Lest start the minimization
 	minimizer.init()

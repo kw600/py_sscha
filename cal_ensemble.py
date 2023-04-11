@@ -5,7 +5,7 @@ import sscha, sscha.Ensemble, sscha.SchaMinimizer, sscha.Relax
 import sys,os
 
 def generate_ensemble():
-	dyn = CC.Phonons.Phonons("harmonic_dyn", nqirr = 3)
+	dyn = CC.Phonons.Phonons("harmonic_dyn", nqirr = config.nqirr)
 
 	# Apply the sum rule and symmetries
 	dyn.Symmetrize()
@@ -13,16 +13,16 @@ def generate_ensemble():
 	# Flip the imaginary frequencies into real ones
 	dyn.ForcePositiveDefinite()
         
-	ensemble = sscha.Ensemble.Ensemble(dyn, T0 = 100, supercell= dyn.GetSupercell())
+	ensemble = sscha.Ensemble.Ensemble(dyn, T0 = config.T0, supercell= dyn.GetSupercell())
 	# We generate 10 randomly displaced structures in the supercell
-	ensemble.generate(N = 10)
+	ensemble.generate(N = config.N_config)
 
 	ensemble.save("data_ensemble_manual", population = 1)
 	return ensemble
 
 def generate_dft_input():
 	ensemble = generate_ensemble()
-	typical_espresso_header = """
+	typical_espresso_header = f"""
 &control
 	calculation = "scf"
 	tstress = .true.
@@ -31,14 +31,14 @@ def generate_dft_input():
 	pseudo_dir = "pseudo_espresso"
 &end
 &system
-	nat = {}
+	nat = {ensemble.structures[0].N_atoms}
 	ntyp = 2
 	ibrav = 0
-	ecutwfc = 40
-	ecutrho = 160
+	ecutwfc = {config.ecutwfc_2}
+	ecutrho = {config.ecutrho_2}
 &end
 &electrons
-	conv_thr = 1d-6
+	conv_thr = {config.conv_thr_2}
 	!diagonalization = "cg"
 &end
 
@@ -48,7 +48,7 @@ ATOMIC_SPECIES
 
 K_POINTS automatic
 1 1 1 0 0 0
-	""".format(ensemble.structures[0].N_atoms) 
+	"""
 	# We extract the number of atoms form the ensemble and the celldm(1) from the dynamical matrix (it is stored in Angstrom, but espresso wants it in Bohr)
 	# You can also read it on the fourth value of the first data line on the first dynamical matrix file (dyn_start_popilation1_1); In the latter case, it will be already in Bohr.
 
