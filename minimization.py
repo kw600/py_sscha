@@ -93,4 +93,5 @@ if __name__ == "__main__":
 	min.finalize()
 	print('Converged?',min.is_converged())
 	min.plot_results(save_filename='p1', plot=False)
+	min.dyn.save_qe("dyn_pop1_")
 	
