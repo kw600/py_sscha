@@ -1,0 +1,4 @@
+#!/bin/bash
+python check_DFT.py
+cd run_calculation
+sbatch dft_continue

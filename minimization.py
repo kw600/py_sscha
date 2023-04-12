@@ -52,8 +52,8 @@ def collect_data():
 				stress[i, :] = [float(x) for x in lines[index].split()[:3]]
 
 			# We can save the forces_population1_X.dat and pressures_population1_X.dat files
-			force_file = os.path.join("data_ensemble_manual", "forces_population1_{}.dat".format(id_number))
-			stress_file = os.path.join("data_ensemble_manual", "pressures_population1_{}.dat".format(id_number))
+			force_file = os.path.join("data_ensemble_manual", "forces_population{}_{}.dat".format(config.population,id_number))
+			stress_file = os.path.join("data_ensemble_manual", "pressures_population{}_{}.dat".format(config.population,id_number))
 			np.savetxt(force_file, forces)
 			np.savetxt(stress_file, stress)
 		except:
@@ -66,9 +66,13 @@ def scha():
 	IO_freq = sscha.Utilities.IOInfo()
 	IO_freq.SetupSaving("minim_info")
 
-	dyn = CC.Phonons.Phonons("harmonic_dyn", nqirr = config.nqirr)
-	dyn.Symmetrize()
-	dyn.ForcePositiveDefinite()
+	if config.population == 1:
+			dyn = CC.Phonons.Phonons("harmonic_dyn", nqirr = config.nqirr)
+			dyn.Symmetrize()
+			dyn.ForcePositiveDefinite()
+	else:
+			dyn = CC.Phonons.Phonons(f"dyn_pop{int(config.population-1)}_", nqirr = config.nqirr)
+
 	ensemble = sscha.Ensemble.Ensemble(dyn, T0 = config.T0, supercell= dyn.GetSupercell())
 	ensemble.load("data_ensemble_manual", population = config.population, N = config.N_config)
 	ensemble.update_weights(dyn, config.T0) # Restore the original density matrix at T = 100 K
@@ -96,5 +100,5 @@ if __name__ == "__main__":
 	min.finalize()
 	print('Converged?',min.is_converged())
 	min.plot_results(save_filename='p1', plot=False)
-	min.dyn.save_qe("dyn_pop1_")
+	min.dyn.save_qe(f"dyn_pop{config.population}_")
 	
