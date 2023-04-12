@@ -9,9 +9,9 @@ nqirr = count - 1 #number of irreducible q points
 
 
 #general
-nq1 = 3 #supercell size in each direction
-nq2 = 3
-nq3 = 3
+nq1 = 2 #supercell size in each direction
+nq2 = 2
+nq3 = 2
 T0 = 100
 
 #step1 initial relaxation
@@ -21,7 +21,7 @@ conv_thr = 1e-8 # The convergence for the DFT self-consistency
 k_spacing = 0.2 #A^-1 The minimum distance in the Brillouin zone sampling
 
 # configurations for DFT calculations
-N_config = 40
+N_config = 800
 population = 1
 
 #step2 DFT calculations for the ensemble of configurations
@@ -31,5 +31,5 @@ conv_thr_2 = 1e-8
 
 
 #minimization
-min_step_dyn = 0.5
-kong_liu_ratio = 0.5
+min_step_dyn = 0.1
+kong_liu_ratio = 0.1
