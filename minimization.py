@@ -63,6 +63,9 @@ def collect_data():
 	np.savetxt(energy_file, energies)
 
 def scha():
+	IO_freq = sscha.Utilities.IOInfo()
+	IO_freq.SetupSaving("minim_info")
+
 	dyn = CC.Phonons.Phonons("harmonic_dyn", nqirr = config.nqirr)
 	dyn.Symmetrize()
 	dyn.ForcePositiveDefinite()
@@ -70,7 +73,7 @@ def scha():
 	ensemble.load("data_ensemble_manual", population = config.population, N = config.N_config)
 	ensemble.update_weights(dyn, config.T0) # Restore the original density matrix at T = 100 K
 	minimizer = sscha.SchaMinimizer.SSCHA_Minimizer(ensemble)
-
+	
 	# Ignore the structure minimization (is fixed by symmetry)
 	minimizer.minim_struct = False
 
@@ -84,7 +87,7 @@ def scha():
 
 	# Lest start the minimization
 	minimizer.init()
-	minimizer.run()
+	minimizer.run(custom_function_post = IO_freq.CFP_SaveAll)
 	return minimizer
 
 if __name__ == "__main__":

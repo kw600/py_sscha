@@ -6,8 +6,11 @@ import sys,os
 import config
 
 def generate_ensemble():
-	dyn = CC.Phonons.Phonons("harmonic_dyn", nqirr = config.nqirr)
-
+	if config.population == 1:
+		dyn = CC.Phonons.Phonons("harmonic_dyn", nqirr = config.nqirr)
+	else:
+		dyn = CC.Phonons.Phonons(f"dyn_pop{config.population}_", nqirr = config.nqirr)
+	
 	# Apply the sum rule and symmetries
 	dyn.Symmetrize()
 
@@ -18,7 +21,7 @@ def generate_ensemble():
 	# We generate 10 randomly displaced structures in the supercell
 	ensemble.generate(N = config.N_config)
 
-	ensemble.save("data_ensemble_manual", population = 1)
+	ensemble.save("data_ensemble_manual", population = config.population)
 	return ensemble
 
 def generate_dft_input():
@@ -97,3 +100,29 @@ K_POINTS automatic
 if __name__ == "__main__":
     generate_dft_input()
     
+
+
+#!/bin/bash
+# 
+# Parallel script produced by bolt
+#        Resource: ARCHER2 (HPE Cray EX (128-core per node))
+#    Batch system: Slurm
+#
+# bolt is written by EPCC (http://www.epcc.ed.ac.uk)
+#
+#SBATCH --nodes=1
+#SBATCH --tasks-per-node=128
+#SBATCH --cpus-per-task=1
+#SBATCH --job-name=s1
+#SBATCH --account=e89-ic_m
+#SBATCH --partition=standard
+#SBATCH --qos=standard
+#SBATCH --time=01:0:0
+module load quantum_espresso
+I=$1
+for i in $(seq 1 4)
+do
+index=$((I*4+1-i))
+srun --nodes=1 --ntasks=32 --ntasks-per-node=32 --mem=10240M --distribution=block:block --hint=nomultithread pw.x < espresso_run_${index}.pwi > espresso_run_${index}.pwo
+#echo ${index}
+done

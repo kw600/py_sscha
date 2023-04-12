@@ -46,20 +46,7 @@ else:
 	minimizer.kong_liu_ratio = config.kong_liu_ratio # Usually 0.5 is a good value
 	minimizer.init()
 	minimizer.run()
-
-
-
-
-
-
-	# Generate random configurations and store them to disk
-	results = []
-	for i in range(num_configs):
-		config = [random.randint(1, 100) for j in range(10)]
-		filename = f"core{rank}_config{i}.txt"
-		with open(filename, "w") as f:
-			f.write(",".join(str(x) for x in config))
-		results.append(filename)
+	results = minimizer.results
 	
 	# Send the calculated results to core 0
 	comm.send(results, dest=0)
