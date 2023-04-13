@@ -5,7 +5,7 @@ import sscha, sscha.Ensemble, sscha.SchaMinimizer, sscha.Relax
 import config
 
 def collect_data():
-	directory = "run_calculation"
+	directory = "run_dft{config.population}"
 	output_filenames = [f for f in os.listdir(directory) if f.endswith(".pwo")] # We select only the output files
 	output_files = [os.path.join(directory, f) for f in output_filenames] # We add the directory/outpufilename to load them correctly
 	# We prepare the array of energies
@@ -52,14 +52,14 @@ def collect_data():
 				stress[i, :] = [float(x) for x in lines[index].split()[:3]]
 
 			# We can save the forces_population1_X.dat and pressures_population1_X.dat files
-			force_file = os.path.join("data_ensemble_manual", "forces_population{}_{}.dat".format(config.population,id_number))
-			stress_file = os.path.join("data_ensemble_manual", "pressures_population{}_{}.dat".format(config.population,id_number))
+			force_file = os.path.join("ens{config.population}", "forces_population{}_{}.dat".format(config.population,id_number))
+			stress_file = os.path.join("ens{config.population}", "pressures_population{}_{}.dat".format(config.population,id_number))
 			np.savetxt(force_file, forces)
 			np.savetxt(stress_file, stress)
 		except:
 			print("Error: something went wrong with file {}".format(file))
 	# Now we read all the configurations, we can save the energy file
-	energy_file = os.path.join("data_ensemble_manual", "energies_supercell_population1.dat")
+	energy_file = os.path.join("ens{config.population}", "energies_supercell_population1.dat")
 	np.savetxt(energy_file, energies)
 
 def scha():
@@ -74,7 +74,7 @@ def scha():
 			dyn = CC.Phonons.Phonons(f"dyn_pop{int(config.population-1)}_", nqirr = config.nqirr)
 
 	ensemble = sscha.Ensemble.Ensemble(dyn, T0 = config.T0, supercell= dyn.GetSupercell())
-	ensemble.load("data_ensemble_manual", population = config.population, N = config.N_config)
+	ensemble.load("ens{config.population}", population = config.population, N = config.N_config)
 	ensemble.update_weights(dyn, config.T0) # Restore the original density matrix at T = 100 K
 	minimizer = sscha.SchaMinimizer.SSCHA_Minimizer(ensemble)
 	
