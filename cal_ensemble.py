@@ -18,10 +18,10 @@ def generate_ensemble():
 	dyn.ForcePositiveDefinite()
         
 	ensemble = sscha.Ensemble.Ensemble(dyn, T0 = config.T0, supercell= dyn.GetSupercell())
-	# We generate 10 randomly displaced structures in the supercell
+	# We generate N randomly displaced structures in the supercell
 	ensemble.generate(N = config.N_config)
 
-	ensemble.save("data_ensemble_manual", population = config.population)
+	ensemble.save(f"ens{config.population}", population = config.population)
 	return ensemble
 
 def generate_dft_input():
@@ -65,8 +65,8 @@ K_POINTS automatic
 	# (using os.path.join to concatenate path assure to have the correct behaviour independently on the operating system
 
 	# We will generate the input file in a new directory
-	if not os.path.exists("run_calculation"):
-		os.mkdir("run_calculation")
+	if not os.path.exists("run_dft_{config.population}"):
+		os.mkdir("run_dft_{config.population}")
 
 	for file in all_scf_files:
 		# Now we are cycling on the scf_ files we found.
@@ -79,8 +79,8 @@ K_POINTS automatic
 		number = int(file.split("_")[-1].split(".")[0])
 		
 		# We decide the filename for the espresso input
-		# We will call it run_calculation/espresso_run_X.pwi
-		filename = os.path.join("run_calculation", "espresso_run_{}.pwi".format(number))
+		# We will call it run_dft_{config.population}/espresso_run_X.pwi
+		filename = os.path.join(f"run_dft_{config.population}", "espresso_run_{}.pwi".format(number))
 		
 		# We start writing the file
 		with open(filename, "w") as f:
