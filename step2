@@ -1,9 +1,10 @@
 python cal_ensemble.py
 N=`grep 'N_config' config.py | awk '{print $NF}'`
-cd run_calculation
+p=`grep 'population' config.py | awk '{print $NF}'`
+cd run_dft${p}
 cp -r ../pseudo_espresso ./
 cp ../sub_dft ./
-N1=$((N/32))
+N1=$((N/8))
 for i in `seq 1 ${N1}`
 do
 sbatch sub_dft $i

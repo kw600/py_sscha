@@ -1,7 +1,7 @@
 import os
-
+import config
 # Specify the directory containing the output files
-output_dir = "./run_calculation/"
+output_dir = f"./run_dft{config.population}/"
 b=''
 
 for i in range(1, 129):
@@ -54,6 +54,6 @@ do
 srun --nodes=1 --ntasks=16 --ntasks-per-node=16 --mem=10240M --distribution=block:block --hint=nomultithread pw.x < espresso_run_${l}index{r}.pwi > espresso_run_${l}index{r}.pwo
 done"""
 
-with open("./run_calculation/dft_continue", "w") as f:
+with open(f"./run_dft{config.population}/dft_continue", "w") as f:
 	f.write(sub)
 f.close()
