@@ -21,8 +21,8 @@ conv_thr = 1e-8 # The convergence for the DFT self-consistency
 k_spacing = 0.2 #A^-1 The minimum distance in the Brillouin zone sampling
 
 # configurations for DFT calculations
-N_config = 800
-population = 1
+N_config = 64
+
 
 #step2 DFT calculations for the ensemble of configurations
 ecutwfc_2 = 60

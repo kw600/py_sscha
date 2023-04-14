@@ -5,11 +5,11 @@ import sscha, sscha.Ensemble, sscha.SchaMinimizer, sscha.Relax
 import sys,os
 import config
 
-def generate_ensemble():
-	if config.population == 1:
+def generate_ensemble(pop):
+	if pop == 1:
 		dyn = CC.Phonons.Phonons("harmonic_dyn", nqirr = config.nqirr)
 	else:
-		dyn = CC.Phonons.Phonons(f"dyn_pop{config.population-1}_", nqirr = config.nqirr)
+		dyn = CC.Phonons.Phonons(f"dyn_pop{pop-1}_", nqirr = config.nqirr)
 	
 	# Apply the sum rule and symmetries
 	dyn.Symmetrize()
@@ -21,11 +21,11 @@ def generate_ensemble():
 	# We generate N randomly displaced structures in the supercell
 	ensemble.generate(N = config.N_config)
 
-	ensemble.save(f"ens{config.population}", population = config.population)
+	ensemble.save(f"ens{pop}", population = pop)
 	return ensemble
 
-def generate_dft_input():
-	ensemble = generate_ensemble()
+def generate_dft_input(pop):
+	ensemble = generate_ensemble(pop)
 	typical_espresso_header = f"""
 &control
 	calculation = "scf"
@@ -57,21 +57,21 @@ K_POINTS automatic
 	# You can also read it on the fourth value of the first data line on the first dynamical matrix file (dyn_start_popilation1_1); In the latter case, it will be already in Bohr.
 
 	# Now we need to read the scf files
-	all_scf_files = [os.path.join(f"ens{config.population}", f) for f in os.listdir(f"ens{config.population}") if f.startswith("scf_")]
+	all_scf_files = [os.path.join(f"ens{pop}", f) for f in os.listdir(f"ens{pop}") if f.startswith("scf_")]
 
-	# In the previous line  I am reading all the files inside ens{config.population} os.listdir(ens{config.population}) and iterating over them (the f variable)
+	# In the previous line  I am reading all the files inside ens{pop} os.listdir(ens{pop}) and iterating over them (the f variable)
 	# I iterate only on the filenames that starts with scf_ 
-	# Then I join the directory name ens{config.population} to f. In unix it will be equal to ens{config.population}/scf_....
+	# Then I join the directory name ens{pop} to f. In unix it will be equal to ens{pop}/scf_....
 	# (using os.path.join to concatenate path assure to have the correct behaviour independently on the operating system
 
 	# We will generate the input file in a new directory
-	if not os.path.exists(f"run_dft{config.population}"):
-		os.mkdir(f"run_dft{config.population}")
+	if not os.path.exists(f"run_dft{pop}"):
+		os.mkdir(f"run_dft{pop}")
 
 	for file in all_scf_files:
 		# Now we are cycling on the scf_ files we found.
 		# We must extract the number of the file
-		# The file is the string "ens{config.population}/scf_population1_X.dat"
+		# The file is the string "ens{pop}/scf_population1_X.dat"
 		# Therefore the X number is after the last "_" and before the "." character
 		# We can split before the string file at each "_", isolate the last part "X.dat"
 		# and then split it again on "." (obtaining ["X", "dat"]) and select the first element
@@ -79,8 +79,8 @@ K_POINTS automatic
 		number = int(file.split("_")[-1].split(".")[0])
 		
 		# We decide the filename for the espresso input
-		# We will call it run_dft{config.population}/espresso_run_X.pwi
-		filename = os.path.join(f"run_dft{config.population}", "espresso_run_{}.pwi".format(number))
+		# We will call it run_dft{pop}/espresso_run_X.pwi
+		filename = os.path.join(f"run_dft{pop}", "espresso_run_{}.pwi".format(number))
 		
 		# We start writing the file
 		with open(filename, "w") as f:
@@ -98,7 +98,5 @@ K_POINTS automatic
 	return ensemble
 
 if __name__ == "__main__":
-    generate_dft_input()
-    
-
-
+	pop = int(sys.argv[1])
+	generate_dft_input(pop)

@@ -1,0 +1,2 @@
+#!/bin/bash
+squeue -u kw2318 > q.dat

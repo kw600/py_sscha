@@ -13,23 +13,24 @@ export OMP_NUM_THREADS=1
 
 module load quantum_espresso
 I=$1
-echo "Starting 32 jobs across 4 nodes each using 16 CPUs"
+echo "Job $I : Starting 32 jobs across 4 nodes each using 16 CPUs"
 
 # Loop over 32 subjobs each using 16 CPUs, running in background
 
-for i in $(seq 1+(I-1)*32 I*32)
+for i in $(seq 1 32)
 do
-   echo "Launching job number $i"
+index=$(( (I-1)*32 + i ))
+echo "Launching job number $index"
 
-   # Launch subjob overriding job settings as required and in the
-   # background. Make sure to change the `--mem=` flag to the amount
-   # of memory required. A sensible amount is 1.5 GiB per task as
-   # this leaves some overhead for the OS etc.
+# Launch subjob overriding job settings as required and in the
+# background. Make sure to change the `--mem=` flag to the amount
+# of memory required. A sensible amount is 1.5 GiB per task as
+# this leaves some overhead for the OS etc.
 
-   srun --unbuffered --nodes=1 --ntasks=16 --tasks-per-node=16 \
-        --cpus-per-task=1 --distribution=block:block --hint=nomultithread \
-        --mem=10G --exact \
-        pw.x < espresso_run_${i}.pwi > espresso_run_${i}.pwo &
+srun --unbuffered --nodes=1 --ntasks=16 --tasks-per-node=16 \
+		--cpus-per-task=1 --distribution=block:block --hint=nomultithread \
+		--mem=30G --exact \
+		pw.x < espresso_run_${index}.pwi > espresso_run_${index}.pwo &
 
 done
 # Wait for all subjobs to finish

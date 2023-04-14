@@ -3,6 +3,7 @@ import config
 import sys
 # Specify the directory containing the output files
 pop=sys.argv[1]
+
 output_dir = f"./run_dft{pop}/"
 b=''
 
@@ -32,29 +33,49 @@ for filename in os.listdir(output_dir):
 			
 l='{'
 r='}'
-print(b)
+# print(b)
 sub=f"""#!/bin/bash
-# 
-# Parallel script produced by bolt
-#        Resource: ARCHER2 (HPE Cray EX (128-core per node))
-#    Batch system: Slurm
-#
-# bolt is written by EPCC (http://www.epcc.ed.ac.uk)
-#
-#SBATCH --nodes=1
-#SBATCH --tasks-per-node=128
-#SBATCH --cpus-per-task=1
-#SBATCH --job-name=s1
+# Slurm job options (job-name, compute nodes, job time)
+#SBATCH --nodes=4
 #SBATCH --account=e89-ic_m
 #SBATCH --partition=standard
 #SBATCH --qos=standard
 #SBATCH --time=01:0:0
+
+# Set the number of threads to 1
+#   This prevents any threaded system libraries from automatically
+#   using threading.
+export OMP_NUM_THREADS=1
+
 module load quantum_espresso
 I='{b}'
+
+
+# Loop over 32 subjobs each using 16 CPUs, running in background
+
 for index in $I
 do
-srun --nodes=1 --ntasks=16 --ntasks-per-node=16 --mem=10240M --distribution=block:block --hint=nomultithread pw.x < espresso_run_${l}index{r}.pwi > espresso_run_${l}index{r}.pwo
-done"""
+
+echo "Launching job number $index"
+
+# Launch subjob overriding job settings as required and in the
+# background. Make sure to change the `--mem=` flag to the amount
+# of memory required. A sensible amount is 1.5 GiB per task as
+# this leaves some overhead for the OS etc.
+
+srun --unbuffered --nodes=1 --ntasks=16 --tasks-per-node=16 \
+		--cpus-per-task=1 --distribution=block:block --hint=nomultithread \
+		--mem=10G --exact \
+		pw.x < espresso_run_${l}index{r}.pwi > espresso_run_${l}index{r}.pwo &
+
+done
+# Wait for all subjobs to finish
+echo "Waiting for all jobs to finish ..."
+
+wait
+
+echo "JOB DONE"
+"""
 
 with open(f"./run_dft{pop}/dft_continue", "w") as f:
 	f.write(sub)
