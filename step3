@@ -1,5 +1,5 @@
 #!/bin/bash
-python check_DFT.py
+python check_DFT.py $1
 pwd
 cd run_calculation
 sbatch dft_continue

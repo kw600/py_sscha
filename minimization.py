@@ -4,8 +4,8 @@ import cellconstructor as CC
 import sscha, sscha.Ensemble, sscha.SchaMinimizer, sscha.Relax
 import config
 
-def collect_data():
-	directory = f"run_dft{config.population}"
+def collect_data(pop):
+	directory = f"run_dft{pop}"
 	output_filenames = [f for f in os.listdir(directory) if f.endswith(".pwo")] # We select only the output files
 	output_files = [os.path.join(directory, f) for f in output_filenames] # We add the directory/outpufilename to load them correctly
 	# We prepare the array of energies
@@ -52,29 +52,29 @@ def collect_data():
 				stress[i, :] = [float(x) for x in lines[index].split()[:3]]
 
 			# We can save the forces_population1_X.dat and pressures_population1_X.dat files
-			force_file = os.path.join(f"ens{config.population}", "forces_population{}_{}.dat".format(config.population,id_number))
-			stress_file = os.path.join(f"ens{config.population}", "pressures_population{}_{}.dat".format(config.population,id_number))
+			force_file = os.path.join(f"ens{pop}", "forces_population{}_{}.dat".format(config.population,id_number))
+			stress_file = os.path.join(f"ens{pop}", "pressures_population{}_{}.dat".format(config.population,id_number))
 			np.savetxt(force_file, forces)
 			np.savetxt(stress_file, stress)
 		except:
 			print("Error: something went wrong with file {}".format(file))
 	# Now we read all the configurations, we can save the energy file
-	energy_file = os.path.join(f"ens{config.population}", "energies_supercell_population1.dat")
+	energy_file = os.path.join(f"ens{pop}", "energies_supercell_population1.dat")
 	np.savetxt(energy_file, energies)
 
-def scha():
+def scha(pop):
 	IO_freq = sscha.Utilities.IOInfo()
 	IO_freq.SetupSaving("minim_info")
 
-	if config.population == 1:
+	if pop == 1:
 			dyn = CC.Phonons.Phonons("harmonic_dyn", nqirr = config.nqirr)
 			dyn.Symmetrize()
 			dyn.ForcePositiveDefinite()
 	else:
-			dyn = CC.Phonons.Phonons(f"dyn_pop{int(config.population-1)}_", nqirr = config.nqirr)
+			dyn = CC.Phonons.Phonons(f"dyn_pop{int(pop-1)}_", nqirr = config.nqirr)
 
 	ensemble = sscha.Ensemble.Ensemble(dyn, T0 = config.T0, supercell= dyn.GetSupercell())
-	ensemble.load(f"ens{config.population}", population = config.population, N = config.N_config)
+	ensemble.load(f"ens{pop}", population = pop, N = config.N_config)
 	ensemble.update_weights(dyn, config.T0) # Restore the original density matrix at T = 100 K
 	minimizer = sscha.SchaMinimizer.SSCHA_Minimizer(ensemble)
 	
@@ -92,13 +92,14 @@ def scha():
 	# Lest start the minimization
 	minimizer.init()
 	minimizer.run(custom_function_post = IO_freq.CFP_SaveAll)
-	return minimizer
+	minimizer.finalize()
+	minimizer.dyn.save_qe(f"dyn_pop{pop}_")
+	print('Converged?',minimizer.is_converged())
+	return minimizer.is_converged()
 
-if __name__ == "__main__":
-	collect_data()
-	min=scha()
-	min.finalize()
-	print('Converged?',min.is_converged())
-	# min.plot_results(save_filename='p1', plot=False)
-	min.dyn.save_qe(f"dyn_pop{config.population}_")
+# if __name__ == "__main__":
+# 	collect_data(pop)
+# 	min=scha(pop)
+	
+
 	

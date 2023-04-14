@@ -1,10 +1,12 @@
 import os
 import config
+import sys
 # Specify the directory containing the output files
-output_dir = f"./run_dft{config.population}/"
+pop=sys.argv[1]
+output_dir = f"./run_dft{pop}/"
 b=''
 
-for i in range(1, 129):
+for i in range(1, config.N_config+1):
 	# Construct the filename for the current index
 	filename = f"espresso_run_{i}.pwo"
 	# Check if the file exists in the output directory
@@ -54,6 +56,6 @@ do
 srun --nodes=1 --ntasks=16 --ntasks-per-node=16 --mem=10240M --distribution=block:block --hint=nomultithread pw.x < espresso_run_${l}index{r}.pwi > espresso_run_${l}index{r}.pwo
 done"""
 
-with open(f"./run_dft{config.population}/dft_continue", "w") as f:
+with open(f"./run_dft{pop}/dft_continue", "w") as f:
 	f.write(sub)
 f.close()
