@@ -98,7 +98,7 @@ def DFT(pop):
 
 converge = False
 pop = 1
-while converge:
+while not converge:
 	DFT(pop)
 	collect_data(pop)
 	print('nqirr',config.nqirr)
