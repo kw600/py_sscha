@@ -35,6 +35,12 @@ def check_complete(output_dir,key='JOB DONE'):
 	else:
 		return False, b
 
+def checkq():
+	subprocess.run(["./queue"])
+	with open(os.path.join('./', 'q.dat'), "r") as f:
+		contents = f.readlines()
+	return len(contents)
+
 def DFT(pop):
 	current_path = os.getcwd()
 	subprocess.run(["./step1"])
@@ -51,12 +57,6 @@ def DFT(pop):
 		else:
 			print('Waiting for harmonic calculations to be started...')
 			time.sleep(10)
-
-def checkq():
-	subprocess.run(["./queue"])
-	with open(os.path.join('./', 'q.dat'), "r") as f:
-		contents = f.readlines()
-	return len(contents)
 
 	#check if the harmonic calculations are finished
 	while True:
