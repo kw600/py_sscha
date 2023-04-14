@@ -11,7 +11,7 @@ def collect_data(pop):
 	# We prepare the array of energies
 	energies = np.zeros(len(output_files)) 
 	for file in output_files:
-		try:	
+		# try:	
 			# Get the number of the configuration.
 			id_number = int(file.split("_")[-1].split(".")[0]) # The same as before, we need the to extract the configuration number from the filename
 			
@@ -52,19 +52,19 @@ def collect_data(pop):
 				stress[i, :] = [float(x) for x in lines[index].split()[:3]]
 
 			# We can save the forces_population1_X.dat and pressures_population1_X.dat files
-			force_file = os.path.join(f"ens{pop}", "forces_population{}_{}.dat".format(config.population,id_number))
-			stress_file = os.path.join(f"ens{pop}", "pressures_population{}_{}.dat".format(config.population,id_number))
+			force_file = os.path.join(f"ens{pop}", "forces_population{}_{}.dat".format(pop,id_number))
+			stress_file = os.path.join(f"ens{pop}", "pressures_population{}_{}.dat".format(pop,id_number))
 			np.savetxt(force_file, forces)
 			np.savetxt(stress_file, stress)
-		except:
-			print("Error: something went wrong with file {}".format(file))
+		# except:
+		# 	print("Error: something went wrong with file {}".format(file))
 	# Now we read all the configurations, we can save the energy file
 	energy_file = os.path.join(f"ens{pop}", "energies_supercell_population1.dat")
 	np.savetxt(energy_file, energies)
 
 def scha(pop):
 	IO_freq = sscha.Utilities.IOInfo()
-	IO_freq.SetupSaving("minim_info")
+	IO_freq.SetupSaving("minim_info{pop}")
 
 	if pop == 1:
 			dyn = CC.Phonons.Phonons("harmonic_dyn", nqirr = config.nqirr)
@@ -75,7 +75,8 @@ def scha(pop):
 
 	ensemble = sscha.Ensemble.Ensemble(dyn, T0 = config.T0, supercell= dyn.GetSupercell())
 	ensemble.load(f"ens{pop}", population = pop, N = config.N_config)
-	ensemble.update_weights(dyn, config.T0) # Restore the original density matrix at T = 100 K
+	if pop == 1:
+			ensemble.update_weights(dyn, config.T0) # Restore the original density matrix at T = 100 K
 	minimizer = sscha.SchaMinimizer.SSCHA_Minimizer(ensemble)
 	
 	# Ignore the structure minimization (is fixed by symmetry)

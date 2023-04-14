@@ -1,6 +1,7 @@
 import os
 import config
 import sys
+import numpy as np
 # Specify the directory containing the output files
 pop=sys.argv[1]
 
@@ -33,10 +34,12 @@ for filename in os.listdir(output_dir):
 			
 l='{'
 r='}'
-# print(b)
+n=np.ceil(len(b.split())/8)
+if n>16:
+	raise ValueError("Too many jobs to continue, please check.")
 sub=f"""#!/bin/bash
 # Slurm job options (job-name, compute nodes, job time)
-#SBATCH --nodes=4
+#SBATCH --nodes={n}
 #SBATCH --account=e89-ic_m
 #SBATCH --partition=standard
 #SBATCH --qos=standard

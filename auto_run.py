@@ -43,30 +43,17 @@ def checkq():
 
 def DFT(pop):
 	current_path = os.getcwd()
-	subprocess.run(["./step1"])
+	if pop==1:
+		subprocess.run(["./step1"])
 
-	#check if slurm file is created, which means the harmonic calculations are started
-	while True:
-		a=0
-		for filename in os.listdir('./'):
-			if filename.startswith("slurm"):
-				f1 = filename
-				a=1
-		if a==1:
-			break
-		else:
-			print('Waiting for harmonic calculations to be started...')
-			time.sleep(10)
-
-	#check if the harmonic calculations are finished
-	while True:
-		with open(os.path.join('./', f1), "r") as f:
-			contents = f.read()
-		if 'JOB DONE' not in contents:
-			print('Waiting for harmonic calculations to be finished...')
-			time.sleep(30)
-		else:
-			break
+		#check if the submitted job is finished
+		while True:
+			if checkq()==1:
+				print("Harmonic calculations done.")
+				break
+			else:
+				print('Waiting for harmonic calculations to be finished...')
+				time.sleep(30)
 
 	#run the step2
 	subprocess.run(["./step2",str(pop)])
@@ -74,7 +61,7 @@ def DFT(pop):
 	#check if the DFT calculations are finished
 	DFT_path=os.path.join(current_path, f"run_dft{pop}")
 	while True:
-		if check_dft(DFT_path):
+		if check_dft(DFT_path) and checkq()==1:
 			print("DFT calculations done. Check whether results are complete.")
 			break
 		else:
@@ -94,8 +81,7 @@ def DFT(pop):
 				else:
 					print('Waiting for DFT calculations...')
 					time.sleep(30)
-			
-
+	
 converge = False
 pop = 1
 while not converge:
