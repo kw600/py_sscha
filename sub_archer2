@@ -18,3 +18,4 @@ module load quantum_espresso
 module list
 srun --distribution=block:block --hint=nomultithread pw.x < espresso.pwi > espresso.pwo
 srun --distribution=block:block --hint=nomultithread ph.x < harmonic.phi > harmonic.pho
+echo 'JOB DONE'

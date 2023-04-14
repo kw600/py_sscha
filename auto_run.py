@@ -14,7 +14,7 @@ def check_dft(output_dir):
 
 	return True
 
-def check_complete(output_dir):
+def check_complete(output_dir,key='JOB DONE'):
 	b=''
 	# Loop through all the files in the directory
 	for filename in os.listdir(output_dir):
@@ -25,7 +25,7 @@ def check_complete(output_dir):
 			with open(os.path.join(output_dir, filename), "r") as f:
 				contents = f.read()
 			# Check if the keyword "Job done" is in the file contents
-			if "JOB DONE" not in contents:
+			if key not in contents:
 				a=filename.replace("_",".")
 				a=a.split(".")
 				# If the keyword is not found, print the filename
@@ -37,11 +37,19 @@ def DFT(pop):
 	current_path = os.getcwd()
 	subprocess.run(["./step1"])
 
-	if os.path.isfile(os.path.join(current_path, "dyn3")):
-		print("File dyn3 exists. Proceed to next step.")
-	else:
-		print('Waiting for dyn3 file...')
-		time.sleep(60)
+	
+	for filename in os.listdir('./'):
+		if filename.startswith("slurm"):
+			with open(os.path.join('./', filename), "r") as f:
+				contents = f.read()
+			if 'JOB DONE' not in contents:
+				print('Waiting for harmonic calculations...')
+				time.sleep(30)
+			else:
+				break
+		else:
+			print('Waiting for harmonic calculations...')
+			time.sleep(30)
 
 	subprocess.run(["./step2"])
 
