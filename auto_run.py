@@ -90,6 +90,9 @@ while not converge:
 	print('nqirr',config.nqirr)
 	converge=scha(pop)
 	pop+=1
+	if pop>=config.maxpop:
+		print("Maximum population reached. Please check the results.")
+		break
 
 
 

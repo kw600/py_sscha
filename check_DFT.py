@@ -34,7 +34,7 @@ for filename in os.listdir(output_dir):
 			
 l='{'
 r='}'
-n=np.ceil(len(b.split())/8)
+n=int(np.ceil(len(b.split())/8))
 if n>16:
 	raise ValueError("Too many jobs to continue, please check.")
 sub=f"""#!/bin/bash

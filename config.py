@@ -22,6 +22,7 @@ k_spacing = 0.2 #A^-1 The minimum distance in the Brillouin zone sampling
 
 # configurations for DFT calculations
 N_config = 64
+maxpop=2
 
 
 #step2 DFT calculations for the ensemble of configurations
