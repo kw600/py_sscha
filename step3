@@ -2,7 +2,7 @@
 python check_DFT.py $1 
 cd run_dft$1
 I=`ls dft* | wc -l`
-for i in $(seq 1 I)
+for i in `seq 1 ${I}`
 do
 sbatch dft_continue$I
 done
