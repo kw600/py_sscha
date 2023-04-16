@@ -112,17 +112,24 @@ def check_complete(output_dir,key='JOB DONE'):
 
 def checkq():
 	subprocess.run(["./queue"])
+	c=1
 	with open(os.path.join('./', 'q.dat'), "r") as f:
 		contents = f.readlines()
-	return len(contents)
+	for i in contents:
+		if config.taskname in i:
+			c+=1
+	return c
 
 def DFT(pop):
 	current_path = os.getcwd()
 	if pop==1:
-		subprocess.run(["./step1"])
-
+		if not os.path.exists('./harmonic_dyn0'):
+			subprocess.run(["./step1"])
+			T=True
+		else:
+			T=False
 		#check if the submitted job is finished
-		while True:
+		while T:
 			if checkq()==1:
 				print("Harmonic calculations done.")
 				break
@@ -152,7 +159,11 @@ def DFT(pop):
 			break
 		else:
 			print(f"DFT calculations with index {check_complete(DFT_path)[1]} incomplete. ")
-			subprocess.run(["./step3",str(pop)])
+			try:
+				subprocess.run(["./step3",str(pop)])
+			except:
+				print("Error in submitting incomplete job. Please check the error message.")
+				exit()
 			while True:
 				if checkq()==1:
 					break

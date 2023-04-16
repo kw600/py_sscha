@@ -35,8 +35,10 @@ for filename in os.listdir(output_dir):
 l='{'
 r='}'
 n=int(np.ceil(len(b.split())/8))
-if n>16:
+if n>0.25*config.N_config:
+	print(f'Too many jobs (n={n}) to continue, please check.')
 	raise ValueError("Too many jobs to continue, please check.")
+
 sub=f"""#!/bin/bash
 # Slurm job options (job-name, compute nodes, job time)
 #SBATCH --nodes={n}
