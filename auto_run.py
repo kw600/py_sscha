@@ -80,8 +80,8 @@ echo "... all jobs finished"
 		f.write(s2)
 
 def check_dft(output_dir):
+	n=0
 	for i in range(1, config.N_config+1):
-		n=0
 		# Construct the filename for the current index
 		filename = f"espresso_run_{i}.pwo"
 		# Check if the file exists in the output directory
@@ -95,6 +95,7 @@ def check_dft(output_dir):
 		print("{config.N_config-n} files are missing.")
 		return True
 	else:
+		# print(n)
 		return False
 
 
@@ -159,6 +160,7 @@ def DFT(pop):
 		elif not check_dft(DFT_path) and checkq()==1:
 			print('Considering to Resubmit the job')
 			print('No job is running.')
+			exit()
 			# subprocess.run(["./step2",str(pop)])
 		else:
 			print('Waiting for DFT calculations...')

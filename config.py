@@ -1,8 +1,8 @@
 import os
 
-#archer2 details
-taskname='scha1'
-account='e89-ic_m'
+#archer2 details. Please change the account name!!
+taskname='scha1' #name of the task. Should be different if several auto_run.py are running at the same time 
+account='e89-ic_m' #account name
 
 
 cq = 0
@@ -26,8 +26,8 @@ conv_thr = 1e-8 # The convergence for the DFT self-consistency
 k_spacing = 0.2 #A^-1 The minimum distance in the Brillouin zone sampling
 
 # configurations for DFT calculations
-N_config = 256
-maxpop=5
+N_config = 256 #number of configurations. Better to be a power of 32
+maxpop=1 #maximum population/iteration
 
 
 #step2 DFT calculations for the ensemble of configurations
