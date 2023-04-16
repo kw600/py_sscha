@@ -6,6 +6,7 @@ from minimization import *
 def write_sub():
 	l='{'
 	r='}'
+	dd='\\'
 	s1=f"""#!/bin/bash
 # 
 # Parallel script produced by bolt
@@ -27,13 +28,12 @@ module list
 srun --distribution=block:block --hint=nomultithread pw.x < espresso.pwi > espresso.pwo
 srun --distribution=block:block --hint=nomultithread ph.x < harmonic.phi > harmonic.pho
 echo 'JOB DONE'
-	"""
+"""
 
 	s2=f"""#!/bin/bash
 # Slurm job options (job-name, compute nodes, job time)
 #SBATCH --nodes=4
-#SBATCH --job-name={config.taskname}
-#SBATCH --account={config.account}
+#SBATCH --account=e89-ic_m
 #SBATCH --partition=standard
 #SBATCH --qos=standard
 #SBATCH --time=01:0:0
@@ -44,25 +44,24 @@ echo 'JOB DONE'
 export OMP_NUM_THREADS=1
 
 module load quantum_espresso
-I=$1
-echo "Job $I : Starting 32 jobs across 4 nodes each using 16 CPUs"
+
+echo "Starting 32 jobs across 4 nodes each using 16 CPUs"
 
 # Loop over 32 subjobs each using 16 CPUs, running in background
 
 for i in $(seq 1 32)
 do
-index=$(( (I-1)*32 + i ))
-echo "Launching job number $index"
+   echo "Launching job number $i"
 
-# Launch subjob overriding job settings as required and in the
-# background. Make sure to change the `--mem=` flag to the amount
-# of memory required. A sensible amount is 1.5 GiB per task as
-# this leaves some overhead for the OS etc.
+   # Launch subjob overriding job settings as required and in the
+   # background. Make sure to change the `--mem=` flag to the amount
+   # of memory required. A sensible amount is 1.5 GiB per task as
+   # this leaves some overhead for the OS etc.
 
-srun --unbuffered --nodes=1 --ntasks=16 --tasks-per-node=16 \
-		--cpus-per-task=1 --distribution=block:block --hint=nomultithread \
-		--mem=30G --exact \
-		pw.x < espresso_run_${l}index{r}.pwi > espresso_run_${l}index{r}.pwo &
+   srun --unbuffered --nodes=1 --ntasks=16 --tasks-per-node=16 {dd}
+        --cpus-per-task=1 --distribution=block:block --hint=nomultithread {dd}
+        --mem=24G --exact {dd}
+        pw.x < espresso_run_${l}i{r}.pwi > espresso_run_${l}i{r}.pwo &
 
 done
 # Wait for all subjobs to finish
@@ -71,7 +70,7 @@ echo "Waiting for all jobs to finish ..."
 wait
 
 echo "... all jobs finished"
-	"""
+"""
 
 	with open('sub_archer2', 'w') as f:
 		f.write(s1)
@@ -127,6 +126,7 @@ def DFT(pop):
 			subprocess.run(["./step1"])
 			T=True
 		else:
+			print('Harminc calculations already done. Skip step1.')
 			T=False
 		#check if the submitted job is finished
 		while T:

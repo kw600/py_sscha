@@ -52,11 +52,7 @@ ATOMIC_SPECIES
 
 K_POINTS automatic
 1 1 1 0 0 0
-	"""
-	# We extract the number of atoms form the ensemble and the celldm(1) from the dynamical matrix (it is stored in Angstrom, but espresso wants it in Bohr)
-	# You can also read it on the fourth value of the first data line on the first dynamical matrix file (dyn_start_popilation1_1); In the latter case, it will be already in Bohr.
-
-	# Now we need to read the scf files
+"""
 	all_scf_files = [os.path.join(f"ens{pop}", f) for f in os.listdir(f"ens{pop}") if f.startswith("scf_")]
 
 	# In the previous line  I am reading all the files inside ens{pop} os.listdir(ens{pop}) and iterating over them (the f variable)
@@ -69,31 +65,17 @@ K_POINTS automatic
 		os.mkdir(f"run_dft{pop}")
 
 	for file in all_scf_files:
-		# Now we are cycling on the scf_ files we found.
-		# We must extract the number of the file
-		# The file is the string "ens{pop}/scf_population1_X.dat"
-		# Therefore the X number is after the last "_" and before the "." character
-		# We can split before the string file at each "_", isolate the last part "X.dat"
-		# and then split it again on "." (obtaining ["X", "dat"]) and select the first element
-		# then we convert the "X" string into an integer
 		number = int(file.split("_")[-1].split(".")[0])
-		
-		# We decide the filename for the espresso input
-		# We will call it run_dft{pop}/espresso_run_X.pwi
 		filename = os.path.join(f"run_dft{pop}", "espresso_run_{}.pwi".format(number))
 		
 		# We start writing the file
 		with open(filename, "w") as f:
-			# We write the header
 			f.write(typical_espresso_header)
 			
 			# Load the scf_population_X.dat file
 			ff = open(file, "r")
 			structure_lines = ff.readlines()
 			ff.close()
-			
-			# Write the content on the espresso_run_X.pwi file
-			# Note in the files we specify the units for both the cell and the structure [Angstrom]
 			f.writelines(structure_lines)
 	return ensemble
 
