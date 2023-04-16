@@ -38,6 +38,7 @@ echo 'JOB DONE'
 #SBATCH --partition=standard
 #SBATCH --qos=standard
 #SBATCH --time=01:0:0
+I=$1
 
 # Set the number of threads to 1
 #   This prevents any threaded system libraries from automatically
@@ -52,8 +53,8 @@ echo "Starting 32 jobs across 4 nodes each using 16 CPUs"
 
 for i in $(seq 1 32)
 do
-   echo "Launching job number $i"
-
+   index=$(( (I-1)*32 + i ))
+   echo "Launching job number $i with index $index"
    # Launch subjob overriding job settings as required and in the
    # background. Make sure to change the `--mem=` flag to the amount
    # of memory required. A sensible amount is 1.5 GiB per task as
@@ -62,7 +63,7 @@ do
    srun --unbuffered --nodes=1 --ntasks=16 --tasks-per-node=16 {dd}
         --cpus-per-task=1 --distribution=block:block --hint=nomultithread {dd}
         --mem=24G --exact {dd}
-        pw.x < espresso_run_${l}i{r}.pwi > espresso_run_${l}i{r}.pwo &
+        pw.x < espresso_run_${l}index{r}.pwi > espresso_run_${l}index{r}.pwo &
 
 done
 # Wait for all subjobs to finish
@@ -80,14 +81,22 @@ echo "... all jobs finished"
 
 def check_dft(output_dir):
 	for i in range(1, config.N_config+1):
+		n=0
 		# Construct the filename for the current index
 		filename = f"espresso_run_{i}.pwo"
 		# Check if the file exists in the output directory
-		if not os.path.exists(os.path.join(output_dir, filename)):
+		if os.path.exists(os.path.join(output_dir, filename)):
 			# If the file does not exist, print an error message
 			# print(f"File {filename} does not exist.",config.N_config)
-			return False
-	return True
+			n+=1
+	if n==config.N_config:
+		return True
+	elif n>0.75*config.N_config:
+		print("{config.N_config-n} files are missing.")
+		return True
+	else:
+		return False
+
 
 def check_complete(output_dir,key='JOB DONE'):
 	b=''
