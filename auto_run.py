@@ -64,6 +64,9 @@ def DFT(pop):
 		if check_dft(DFT_path) and checkq()==1:
 			print("DFT calculations done. Check whether results are complete.")
 			break
+		elif not check_dft(DFT_path) and checkq()==1:
+			print('Re-submit job')
+			subprocess.run(["./step2",str(pop)])
 		else:
 			print('Waiting for DFT calculations...')
 			time.sleep(30)

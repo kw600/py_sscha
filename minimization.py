@@ -59,7 +59,7 @@ def collect_data(pop):
 		# except:
 		# 	print("Error: something went wrong with file {}".format(file))
 	# Now we read all the configurations, we can save the energy file
-	energy_file = os.path.join(f"ens{pop}", "energies_supercell_population1.dat")
+	energy_file = os.path.join(f"ens{pop}", f"energies_supercell_population{pop}.dat")
 	np.savetxt(energy_file, energies)
 
 def scha(pop):
@@ -91,7 +91,7 @@ def scha(pop):
 	minimizer.kong_liu_ratio = config.kong_liu_ratio # Usually 0.5 is a good value
 
 	# Lest start the minimization
-	minimizer.init()
+	# minimizer.init()
 	minimizer.run(custom_function_post = IO_freq.CFP_SaveAll)
 	minimizer.finalize()
 	minimizer.dyn.save_qe(f"dyn_pop{pop}_")

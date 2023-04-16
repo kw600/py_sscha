@@ -4,7 +4,7 @@ N=`grep 'N_config' config.py | awk '{print $NF}'`
 cd run_dft$1
 cp -r ../pseudo_espresso ./
 cp ../sub_dft ./
-N1=$((N/32))
+N1=`python -c "from math import ceil;print(ceil($N/32))"`
 for i in `seq 1 ${N1}`
 do
 sbatch sub_dft $i
