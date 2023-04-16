@@ -37,7 +37,7 @@ echo 'JOB DONE'
 #SBATCH --account={config.account}
 #SBATCH --partition=standard
 #SBATCH --qos=standard
-#SBATCH --time=01:0:0
+#SBATCH --time=00:10:00
 I=$1
 
 # Set the number of threads to 1
@@ -47,22 +47,22 @@ export OMP_NUM_THREADS=1
 
 module load quantum_espresso
 
-echo "Starting 32 jobs across 4 nodes each using 16 CPUs"
+echo "Starting 64 jobs across 4 nodes each using 16 CPUs"
 
-# Loop over 32 subjobs each using 16 CPUs, running in background
+# Loop over subjobs each using 16 CPUs, running in background
 
-for i in $(seq 1 32)
+for i in $(seq 1 {4*config.nrun_per_node})
 do
-   index=$(( (I-1)*32 + i ))
+   index=$(((I-1)*{4*config.nrun_per_node}+i))
    echo "Launching job number $i with index $index"
    # Launch subjob overriding job settings as required and in the
    # background. Make sure to change the `--mem=` flag to the amount
    # of memory required. A sensible amount is 1.5 GiB per task as
    # this leaves some overhead for the OS etc.
 
-   srun --unbuffered --nodes=1 --ntasks=16 --tasks-per-node=16 {dd}
+   srun --unbuffered --nodes=1 --ntasks={int(128/config.nrun_per_node)} --tasks-per-node={int(128/config.nrun_per_node)} {dd}
         --cpus-per-task=1 --distribution=block:block --hint=nomultithread {dd}
-        --mem=24G --exact {dd}
+        --mem={int(200/config.nrun_per_node)}G --exact {dd}
         pw.x < espresso_run_${l}index{r}.pwi > espresso_run_${l}index{r}.pwo &
 
 done

@@ -34,7 +34,7 @@ for filename in os.listdir(output_dir):
 			
 l='{'
 r='}'
-n=int(np.ceil(len(b.split())/8))
+n=int(np.ceil(len(b.split())/config.nrun_per_node))
 if n>0.25*config.N_config:
 	print(f'Too many jobs (n={n}) to continue, please check.')
 	raise ValueError("Too many jobs to continue, please check.")
@@ -56,9 +56,6 @@ export OMP_NUM_THREADS=1
 module load quantum_espresso
 I='{b}'
 
-
-# Loop over 32 subjobs each using 16 CPUs, running in background
-
 for index in $I
 do
 
@@ -69,9 +66,9 @@ echo "Launching job number $index"
 # of memory required. A sensible amount is 1.5 GiB per task as
 # this leaves some overhead for the OS etc.
 
-srun --unbuffered --nodes=1 --ntasks=16 --tasks-per-node=16 \
+srun --unbuffered --nodes=1 --ntasks={int(128/config.nrun_per_node)} --tasks-per-node={int(128/config.nrun_per_node)} \
 		--cpus-per-task=1 --distribution=block:block --hint=nomultithread \
-		--mem=10G --exact \
+		--mem={int(200/config.nrun_per_node)}G --exact \
 		pw.x < espresso_run_${l}index{r}.pwi > espresso_run_${l}index{r}.pwo &
 
 done

@@ -82,3 +82,6 @@ K_POINTS automatic
 if __name__ == "__main__":
 	pop = int(sys.argv[1])
 	generate_dft_input(pop)
+
+
+
