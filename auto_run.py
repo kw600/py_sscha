@@ -148,11 +148,16 @@ def DFT(pop):
 				print('Waiting for harmonic calculations to be finished...')
 				time.sleep(30)
 
+	DFT_path=os.path.join(current_path, f"run_dft{pop}")	
+	
 	#run the step2
-	subprocess.run(["./step2",str(pop)])
+	if check_complete(DFT_path)[0]:
+		pass
+	else:
+		subprocess.run(["./step2",str(pop)])
 
 	#check if the DFT calculations are finished
-	DFT_path=os.path.join(current_path, f"run_dft{pop}")
+	
 	while True:
 		if check_dft(DFT_path) and checkq()==1:
 			print("DFT calculations done. Check whether results are complete.")
