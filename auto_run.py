@@ -33,7 +33,8 @@ echo 'JOB DONE'
 	s2=f"""#!/bin/bash
 # Slurm job options (job-name, compute nodes, job time)
 #SBATCH --nodes=4
-#SBATCH --account=e89-ic_m
+#SBATCH --job-name={config.taskname}
+#SBATCH --account={config.account}
 #SBATCH --partition=standard
 #SBATCH --qos=standard
 #SBATCH --time=01:0:0
@@ -84,7 +85,7 @@ def check_dft(output_dir):
 		# Check if the file exists in the output directory
 		if not os.path.exists(os.path.join(output_dir, filename)):
 			# If the file does not exist, print an error message
-			print(f"File {filename} does not exist.",config.N_config)
+			# print(f"File {filename} does not exist.",config.N_config)
 			return False
 	return True
 
@@ -147,8 +148,9 @@ def DFT(pop):
 			print("DFT calculations done. Check whether results are complete.")
 			break
 		elif not check_dft(DFT_path) and checkq()==1:
-			print('Re-submit job')
-			subprocess.run(["./step2",str(pop)])
+			print('Considering to Resubmit the job')
+			print('No job is running.')
+			# subprocess.run(["./step2",str(pop)])
 		else:
 			print('Waiting for DFT calculations...')
 			time.sleep(30)
