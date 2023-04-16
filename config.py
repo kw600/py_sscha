@@ -40,5 +40,5 @@ conv_thr_2 = 1e-8
 
 
 #minimization
-min_step_dyn = 0.1
-kong_liu_ratio = 0.1
+min_step_dyn = 0.5
+kong_liu_ratio = 0.5
