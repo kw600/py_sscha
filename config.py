@@ -1,11 +1,16 @@
 import os
 
-count = 0
+#archer2 details
+taskname='scha1'
+account='e89-ic_m'
+
+
+cq = 0
 for root, dirs, files in os.walk("."):
     for file in files:
         if "harmonic_dyn" in file:
-            count += 1
-nqirr = count - 1 #number of irreducible q points
+            cq += 1
+nqirr = cq - 1 #number of irreducible q points
 
 
 #general
@@ -21,8 +26,8 @@ conv_thr = 1e-8 # The convergence for the DFT self-consistency
 k_spacing = 0.2 #A^-1 The minimum distance in the Brillouin zone sampling
 
 # configurations for DFT calculations
-N_config = 64
-maxpop=2
+N_config = 256
+maxpop=5
 
 
 #step2 DFT calculations for the ensemble of configurations

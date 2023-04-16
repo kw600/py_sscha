@@ -1,7 +1,35 @@
-#!/bin/bash
+import config
+l='{'
+r='}'
+
+s1=f""""#!/bin/bash
+# 
+# Parallel script produced by bolt
+#        Resource: ARCHER2 (HPE Cray EX (128-core per node))
+#    Batch system: Slurm
+#
+# bolt is written by EPCC (http://www.epcc.ed.ac.uk)
+#
+#SBATCH --nodes=1
+#SBATCH --tasks-per-node=16
+#SBATCH --cpus-per-task=1
+#SBATCH --job-name={config.taskname}
+#SBATCH --account={config.account}
+#SBATCH --partition=standard
+#SBATCH --qos=standard
+#SBATCH --time=01:0:0
+module load quantum_espresso
+module list
+srun --distribution=block:block --hint=nomultithread pw.x < espresso.pwi > espresso.pwo
+srun --distribution=block:block --hint=nomultithread ph.x < harmonic.phi > harmonic.pho
+echo 'JOB DONE'
+"""
+
+s2=f"""#!/bin/bash
 # Slurm job options (job-name, compute nodes, job time)
 #SBATCH --nodes=4
-#SBATCH --account=e89-ic_m
+#SBATCH --job-name={config.taskname}
+#SBATCH --account={config.account}
 #SBATCH --partition=standard
 #SBATCH --qos=standard
 #SBATCH --time=01:0:0
@@ -30,7 +58,7 @@ echo "Launching job number $index"
 srun --unbuffered --nodes=1 --ntasks=16 --tasks-per-node=16 \
 		--cpus-per-task=1 --distribution=block:block --hint=nomultithread \
 		--mem=30G --exact \
-		pw.x < espresso_run_${index}.pwi > espresso_run_${index}.pwo &
+		pw.x < espresso_run_${l}index{r}.pwi > espresso_run_${l}index{r}.pwo &
 
 done
 # Wait for all subjobs to finish
@@ -39,3 +67,9 @@ echo "Waiting for all jobs to finish ..."
 wait
 
 echo "... all jobs finished"
+"""
+
+with open('sub_archer2', 'w') as f:
+	f.write(s1)
+with open('sub_dft', 'w') as f:
+	f.write(s2)

@@ -40,7 +40,8 @@ if n>16:
 sub=f"""#!/bin/bash
 # Slurm job options (job-name, compute nodes, job time)
 #SBATCH --nodes={n}
-#SBATCH --account=e89-ic_m
+#SBATCH --account={config.account}
+#SBATCH --job-name={config.taskname}
 #SBATCH --partition=standard
 #SBATCH --qos=standard
 #SBATCH --time=01:0:0
