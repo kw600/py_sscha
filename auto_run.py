@@ -6,7 +6,7 @@ from minimization import *
 def write_sub():
 	l='{'
 	r='}'
-	s1=f""""#!/bin/bash
+	s1=f"""#!/bin/bash
 # 
 # Parallel script produced by bolt
 #        Resource: ARCHER2 (HPE Cray EX (128-core per node))
@@ -159,19 +159,20 @@ def DFT(pop):
 				else:
 					print('Waiting for DFT calculations...')
 					time.sleep(30)
-					
-write_sub()
-converge = False
-pop = 1
-while not converge:
-	DFT(pop)
-	collect_data(pop)
-	print('nqirr',config.nqirr)
-	converge=scha(pop)
-	pop+=1
-	if pop>config.maxpop:
-		print("Maximum population reached. Please check the results.")
-		break
+
+if __name__ == '__main__':
+	write_sub()
+	converge = False
+	pop = 1
+	while not converge:
+		DFT(pop)
+		collect_data(pop)
+		print('nqirr',config.nqirr)
+		converge=scha(pop)
+		pop+=1
+		if pop>config.maxpop:
+			print("Maximum population reached. Please check the results.")
+			break
 
 
 
