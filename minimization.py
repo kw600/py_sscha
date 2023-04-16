@@ -64,7 +64,7 @@ def collect_data(pop):
 
 def scha(pop):
 	IO_freq = sscha.Utilities.IOInfo()
-	IO_freq.SetupSaving("minim_info{pop}")
+	IO_freq.SetupSaving(f"minim_info{pop}")
 
 	if pop == 1:
 			dyn = CC.Phonons.Phonons("harmonic_dyn", nqirr = config.nqirr)

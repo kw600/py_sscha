@@ -92,7 +92,7 @@ def check_dft(output_dir):
 	if n==config.N_config:
 		return True
 	elif n>0.75*config.N_config:
-		print("{config.N_config-n} files are missing.")
+		# print(f"{config.N_config-n} files are missing.")
 		return True
 	else:
 		# print(n)
@@ -149,9 +149,9 @@ def DFT(pop):
 				time.sleep(30)
 
 	DFT_path=os.path.join(current_path, f"run_dft{pop}")	
-	
+
 	#run the step2
-	if check_complete(DFT_path)[0]:
+	if check_dft(DFT_path):
 		pass
 	else:
 		subprocess.run(["./step2",str(pop)])
