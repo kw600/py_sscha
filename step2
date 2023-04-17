@@ -2,12 +2,13 @@
 python cal_ensemble.py $1
 N=`grep 'N_config' config.py | awk '{print $NF}'`
 n1=`grep 'nrun_per_node' config.py | awk '{print $NF}'`
+n2=`grep 'n_node_per_job' config.py | awk '{print $NF}'`
 cd run_dft$1
 cp -r ../pseudo_espresso ./
 cp ../sub_dft ./
-N1=`python -c "from math import ceil;print(ceil($N/4/$n1))"`
+N1=`python -c "from math import ceil;print(ceil($N/$n2/$n1))"`
 for i in `seq 1 ${N1}`
 do
 sbatch sub_dft $i
-sleep 20
+sleep 1
 done
