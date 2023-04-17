@@ -4,9 +4,13 @@ import cellconstructor as CC
 import sscha, sscha.Ensemble, sscha.SchaMinimizer, sscha.Relax
 import config
 
-def collect_data(pop):
+def collect_data(pop,N=-1):
+	index=''
 	directory = f"run_dft{pop}"
-	output_filenames = [f for f in os.listdir(directory) if f.endswith(".pwo")] # We select only the output files
+	if N==-1:
+		output_filenames = [f for f in os.listdir(directory) if f.endswith(".pwo")] # We select only the output files
+	else:
+		output_filenames = N
 	output_files = [os.path.join(directory, f) for f in output_filenames] # We add the directory/outpufilename to load them correctly
 	# We prepare the array of energies
 	energies = np.zeros(len(output_files)) 
@@ -58,9 +62,13 @@ def collect_data(pop):
 			np.savetxt(stress_file, stress)
 		# except:
 		# 	print("Error: something went wrong with file {}".format(file))
+		# 	index=index+file.replace('_','.').split('.')[-2]
 	# Now we read all the configurations, we can save the energy file
 	energy_file = os.path.join(f"ens{pop}", f"energies_supercell_population{pop}.dat")
 	np.savetxt(energy_file, energies)
+	# if index=='':
+	# 	return True
+	# return index
 
 def scha(pop):
 	IO_freq = sscha.Utilities.IOInfo()

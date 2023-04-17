@@ -120,6 +120,22 @@ def check_complete(output_dir,key='JOB DONE'):
 	else:
 		return False, b
 
+def check_complete1(output_dir,key='JOB DONE'):
+	b=''
+	# Loop through all the files in the directory
+	for filename in os.listdir(output_dir):
+		# Check if the file is a text file
+		if filename.endswith(".pwo"):
+			try:
+				collect_data(pop,filename)
+			except:
+				a=filename.replace("_",".").split(".")
+				b+=a[-2]+" "
+	if b=='':
+		return True, ''
+	else:
+		return False, b
+
 def checkq():
 	subprocess.run(["./queue"])
 	c=1
@@ -196,6 +212,8 @@ if __name__ == '__main__':
 	while not converge:
 		DFT(pop)
 		collect_data(pop)
+
+
 		print('nqirr',config.nqirr)
 		converge=scha(pop)
 		pop+=1
