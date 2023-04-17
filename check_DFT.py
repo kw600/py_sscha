@@ -18,7 +18,7 @@ for i in range(1, config.N_config+1):
 		# print(f"File {filename} does not exist.")
 		b+=str(i)+" "
 
-b=''
+
 # Loop through all the files in the directory
 for filename in os.listdir(output_dir):
 	# Check if the file is a text file
@@ -51,17 +51,18 @@ l='{'
 r='}'
 dd='\\'
 n_node=int(np.ceil(len(b.split())/config.nrun_per_node))
-print(n_node,config.nrun_per_node)
+
 n_job=int(np.ceil(n_node/config.n_node_per_job))
 l0=b.split()
+print(l0)
 nn=1
-if config.check_one_by_one:
-	index=''
+if len(l0)<32:
+
 	for j in range(len(l0)):
-			index=index+l0.pop()+" "
-	sub1=f"""#!/bin/bash
+		
+		sub1=f"""#!/bin/bash
 # Slurm job options (job-name, compute nodes, job time)
-#SBATCH --nodes=4
+#SBATCH --nodes=1
 #SBATCH --ntasks-per-node=128
 #SBATCH --cpus-per-task=1
 #SBATCH --account={config.account}
@@ -76,7 +77,7 @@ if config.check_one_by_one:
 export OMP_NUM_THREADS=1
 
 module load quantum_espresso
-I='{index}'
+I='{l0.pop()}'
 
 for index in $I
 do
@@ -97,17 +98,21 @@ echo "Waiting for all jobs to finish ..."
 
 echo "JOB DONE"
 """
-
-for i in range(n_job):
-	index=''
-	if len(l0)>=config.n_node_per_job*config.nrun_per_node:
-		for j in range(config.nrun_per_node):
-			index=index+l0.pop()+" "
-	else:
-		for j in range(len(l0)):
-			index=index+l0.pop()+" "
-	# print('missing',index)
-	sub=f"""#!/bin/bash
+		with open(f"./run_dft{pop}/dft_continue{nn}", "w") as f:
+			f.write(sub1)
+		nn+=1
+else:
+	nn=1
+	for i in range(n_job):
+		index=''
+		if len(l0)>=config.n_node_per_job*config.nrun_per_node:
+			for j in range(config.nrun_per_node):
+				index=index+l0.pop()+" "
+		else:
+			for j in range(len(l0)):
+				index=index+l0.pop()+" "
+		# print('missing',index)
+		sub=f"""#!/bin/bash
 # Slurm job options (job-name, compute nodes, job time)
 #SBATCH --nodes={config.n_node_per_job}
 #SBATCH --account={config.account}
@@ -146,11 +151,11 @@ echo "Waiting for all jobs to finish ..."
 wait
 
 echo "JOB DONE"
-"""
+	"""
 
-	with open(f"./run_dft{pop}/dft_continue{nn}", "w") as f:
-		if not config.check_one_by_one:
-			f.write(sub)
-		else:
-			f.write(sub1)
-	nn+=1
+		with open(f"./run_dft{pop}/dft_continue{nn}", "w") as f:
+			
+				f.write(sub)
+			
+				
+		nn+=1

@@ -4,8 +4,9 @@ cd run_dft$1
 I=`ls dft_continue* | wc -l`
 for i in `seq 1 ${I}`
 do
-sbatch dft_continue$I
-sleep 20
+sbatch dft_continue$i
+# sleep 20
 done
-rm dft_continue*
+mkdir sub_dir
+mv dft_continue* sub_dir
 cd ../

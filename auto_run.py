@@ -75,7 +75,7 @@ echo "... all jobs finished"
 """
 	s3=f"""#!/bin/bash
 # Slurm job options (job-name, compute nodes, job time)
-#SBATCH --nodes={config.n_node_per_job}
+#SBATCH --nodes=1
 #SBATCH --tasks-per-node=128
 #SBATCH --job-name={config.taskname}
 #SBATCH --account={config.account}
@@ -136,7 +136,7 @@ def check_dft(output_dir):
 		# print(f"{config.N_config-n} files are missing.")
 		return True
 	else:
-		# print(n)
+		
 		return False
 
 def check_complete2(pop,path):
@@ -176,6 +176,14 @@ def check_complete2(pop,path):
 
 def check_complete(pop,output_dir,key='JOB DONE'):
 	b=''
+	for i in range(1, config.N_config+1):
+		# Construct the filename for the current index
+		filename = f"espresso_run_{i}.pwo"
+	# Check if the file exists in the output directory
+		if not os.path.exists(os.path.join(output_dir, filename)):
+			# If the file does not exist, print an error message
+			b+=str(i)+" "
+			print(f"File {filename} does not exist.",config.N_config)
 	# Loop through all the files in the directory
 	for filename in os.listdir(output_dir):
 		# Check if the file is a text file
@@ -190,8 +198,9 @@ def check_complete(pop,output_dir,key='JOB DONE'):
 				a=a.split(".")
 				# If the keyword is not found, print the filename
 				b+=a[-2]+" "
+				print(b)
 	if b=='':
-		return True, ''
+		return True, b
 	else:
 		return False, b
 
