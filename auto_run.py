@@ -174,7 +174,7 @@ def check_complete2(pop,path):
 	
 
 
-def check_complete(output_dir,key='JOB DONE'):
+def check_complete(pop,output_dir,key='JOB DONE'):
 	b=''
 	# Loop through all the files in the directory
 	for filename in os.listdir(output_dir):
@@ -265,7 +265,7 @@ def DFT(pop):
 			time.sleep(30)
 	# print('2',check_complete1(DFT_path)[0])
 	while True:
-		(a,b)=check_complete1(pop,DFT_path)
+		(a,b)=check_complete(pop,DFT_path)
 		if a:
 			print("DFT calculations complete. Proceed to minimization.")
 			break
