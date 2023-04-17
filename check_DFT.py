@@ -26,9 +26,9 @@ for filename in os.listdir(output_dir):
 		
 		# Open the file and read its contents
 		with open(os.path.join(output_dir, filename), "r") as f:
-			contents = f.read()
+			contents = f.readline()
 		# Check if the keyword "Job done" is in the file contents
-		if 'JOB DONE' not in contents:
+		if 'JOB DONE' not in contents[-1]:
 			a=filename.replace("_",".")
 			a=a.split(".")
 			# If the keyword is not found, print the filename
