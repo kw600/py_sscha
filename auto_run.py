@@ -265,7 +265,7 @@ def DFT(pop):
 			time.sleep(30)
 	# print('2',check_complete1(DFT_path)[0])
 	while True:
-		(a,b)=check_complete2(pop,DFT_path)
+		(a,b)=check_complete1(pop,DFT_path)
 		if a:
 			print("DFT calculations complete. Proceed to minimization.")
 			break
