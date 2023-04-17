@@ -9,4 +9,5 @@ N1=`python -c "from math import ceil;print(ceil($N/4/$n1))"`
 for i in `seq 1 ${N1}`
 do
 sbatch sub_dft $i
+sleep 20
 done
