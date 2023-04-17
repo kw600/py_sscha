@@ -173,7 +173,7 @@ def DFT(pop):
 		subprocess.run(["./step2",str(pop)])
 
 	#check if the DFT calculations are finished
-	
+	# print('1')
 	while True:
 		if check_dft(DFT_path) and checkq()==1:
 			print("DFT calculations done. Check whether results are complete.")
@@ -186,9 +186,9 @@ def DFT(pop):
 		else:
 			print('Waiting for DFT calculations...')
 			time.sleep(30)
-		
+	# print('2',check_complete1(DFT_path)[0])
 	while True:
-		if check_complete(DFT_path)[0]:
+		if check_complete1(DFT_path)[0]:
 			print("DFT calculations complete. Proceed to minimization.")
 			break
 		else:
