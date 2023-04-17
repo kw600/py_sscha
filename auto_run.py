@@ -73,11 +73,52 @@ wait
 
 echo "... all jobs finished"
 """
+	s3=f"""#!/bin/bash
+# Slurm job options (job-name, compute nodes, job time)
+#SBATCH --nodes=1
+#SBATCH --tasks-per-node=128
+#SBATCH --job-name={config.taskname}
+#SBATCH --account={config.account}
+#SBATCH --partition=standard
+#SBATCH --qos=taskfarm
+#SBATCH --time=01:00:00
+I=$1
+
+# Set the number of threads to 1
+#   This prevents any threaded system libraries from automatically
+#   using threading.
+export OMP_NUM_THREADS=1
+
+module load quantum_espresso
+
+echo "Starting {config.nrun_per_node} jobs across 1 node one by one"
+
+
+for i in $(seq 1 {config.nrun_per_node})
+do
+index=$(((I-1)*{config.nrun_per_node}+i))
+echo "Launching job number $i with index $index"
+# Launch subjob overriding job settings as required and in the
+# background. Make sure to change the `--mem=` flag to the amount
+# of memory required. A sensible amount is 1.5 GiB per task as
+# this leaves some overhead for the OS etc.
+
+srun --distribution=block:block --hint=nomultithread {dd}
+		pw.x < espresso_run_${l}index{r}.pwi > espresso_run_${l}index{r}.pwo 
+
+done
+
+echo "... all jobs finished"
+"""
 
 	with open('sub_archer2', 'w') as f:
 		f.write(s1)
-	with open('sub_dft', 'w') as f:
-		f.write(s2)
+	if config.one_by_one:
+		with open('sub_dft', 'w') as f:
+			f.write(s3)
+	else:
+		with open('sub_dft', 'w') as f:
+			f.write(s2)
 
 def check_dft(output_dir):
 	n=0
@@ -190,11 +231,12 @@ def DFT(pop):
 			time.sleep(30)
 	# print('2',check_complete1(DFT_path)[0])
 	while True:
-		if check_complete1(DFT_path)[0]:
+		(a,b)=check_complete1(DFT_path)
+		if a:
 			print("DFT calculations complete. Proceed to minimization.")
 			break
 		else:
-			print(f"DFT calculations with index {check_complete1(DFT_path)[1]} incomplete. ")
+			print(f"DFT calculations with index {b} incomplete. ")
 			try:
 				subprocess.run(["./step3",str(pop)])
 			except:

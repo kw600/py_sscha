@@ -40,7 +40,7 @@ n_node=int(np.ceil(len(b.split())/config.nrun_per_node))
 n_job=int(np.ceil(n_node/config.n_node_per_job))
 l0=b.split()
 nn=1
-if n_job==1:
+if n_node==1:
 	index=''
 	for j in range(len(l0)):
 			index=index+l0.pop()+" "
@@ -134,7 +134,7 @@ echo "JOB DONE"
 """
 
 	with open(f"./run_dft{pop}/dft_continue{nn}", "w") as f:
-		if n_job>1:
+		if n_node>1:
 			f.write(sub)
 		else:
 			f.write(sub1)
