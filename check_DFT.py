@@ -46,7 +46,9 @@ if n_job==1:
 			index=index+l0.pop()+" "
 	sub1=f"""#!/bin/bash
 # Slurm job options (job-name, compute nodes, job time)
-#SBATCH --nodes={config.n_node_per_job}
+#SBATCH --nodes=4
+#SBATCH --ntasks-per-node=128
+#SBATCH --cpus-per-task=1
 #SBATCH --account={config.account}
 #SBATCH --job-name={config.taskname}
 #SBATCH --partition=standard
@@ -77,7 +79,6 @@ done
 # Wait for all subjobs to finish
 echo "Waiting for all jobs to finish ..."
 
-wait
 
 echo "JOB DONE"
 """
