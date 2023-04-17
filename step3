@@ -5,6 +5,7 @@ I=`ls dft* | wc -l`
 for i in `seq 1 ${I}`
 do
 sbatch dft_continue$I
+sleep 20
 done
 rm dft_continue*
 cd ../

@@ -51,7 +51,7 @@ for i in range(n_job):
 	# print('missing',index)
 	sub=f"""#!/bin/bash
 # Slurm job options (job-name, compute nodes, job time)
-#SBATCH --nodes=4
+#SBATCH --nodes={n_node_per_job}
 #SBATCH --account={config.account}
 #SBATCH --job-name={config.taskname}
 #SBATCH --partition=standard
