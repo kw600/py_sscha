@@ -36,12 +36,13 @@ l='{'
 r='}'
 dd='\\'
 n_node=int(np.ceil(len(b.split())/config.nrun_per_node))
-n_job=n_node
+n_node_per_job=4
+n_job=int(np.ceil(n_node/n_node_per_job))
 l0=b.split()
 nn=1
 for i in range(n_job):
 	index=''
-	if len(l0)>=config.nrun_per_node:
+	if len(l0)>=n_node_per_job*config.nrun_per_node:
 		for j in range(config.nrun_per_node):
 			index=index+l0.pop()+" "
 	else:
@@ -50,7 +51,7 @@ for i in range(n_job):
 	# print('missing',index)
 	sub=f"""#!/bin/bash
 # Slurm job options (job-name, compute nodes, job time)
-#SBATCH --nodes=1
+#SBATCH --nodes=4
 #SBATCH --account={config.account}
 #SBATCH --job-name={config.taskname}
 #SBATCH --partition=standard
