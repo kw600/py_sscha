@@ -129,7 +129,7 @@ def check_complete1(output_dir,key='JOB DONE'):
 			try:
 				collect_data(pop,filename)
 			except:
-				print(filename)
+				# print(filename)
 				a=filename.replace("_",".").split(".")
 				b+=a[-2]+" "
 			
