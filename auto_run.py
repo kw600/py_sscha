@@ -198,7 +198,7 @@ def check_complete(pop,output_dir,key='JOB DONE'):
 				a=a.split(".")
 				# If the keyword is not found, print the filename
 				b+=a[-2]+" "
-				print(b)
+				# print(b)
 	if b=='':
 		return True, b
 	else:
