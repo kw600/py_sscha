@@ -75,7 +75,7 @@ echo "... all jobs finished"
 """
 	s3=f"""#!/bin/bash
 # Slurm job options (job-name, compute nodes, job time)
-#SBATCH --nodes=1
+#SBATCH --nodes={config.n_node_per_job}
 #SBATCH --tasks-per-node=128
 #SBATCH --job-name={config.taskname}
 #SBATCH --account={config.account}
@@ -91,12 +91,12 @@ export OMP_NUM_THREADS=1
 
 module load quantum_espresso
 
-echo "Starting {config.nrun_per_node} jobs across 1 node one by one"
+echo "Starting {config.nrun_per_node*config.n_node_per_job} jobs across 1 node one by one"
 
 
-for i in $(seq 1 {config.nrun_per_node})
+for i in $(seq 1 {config.nrun_per_node*config.n_node_per_job})
 do
-index=$(((I-1)*{config.nrun_per_node}+i))
+index=$(((I-1)*{config.nrun_per_node*config.n_node_per_job}+i))
 echo "Launching job number $i with index $index"
 # Launch subjob overriding job settings as required and in the
 # background. Make sure to change the `--mem=` flag to the amount

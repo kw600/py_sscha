@@ -7,6 +7,7 @@ account = 'e89-ic_m' #account name
 n_node_per_job = 1
 nrun_per_node = 16 
 one_by_one = True
+check_one_by_one = True
 
 cq = 0
 for root, dirs, files in os.walk("."):

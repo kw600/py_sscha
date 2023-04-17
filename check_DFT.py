@@ -51,17 +51,17 @@ l='{'
 r='}'
 dd='\\'
 n_node=int(np.ceil(len(b.split())/config.nrun_per_node))
-
+print(n_node,config.nrun_per_node)
 n_job=int(np.ceil(n_node/config.n_node_per_job))
 l0=b.split()
 nn=1
-if n_node==1:
+if config.check_one_by_one:
 	index=''
 	for j in range(len(l0)):
 			index=index+l0.pop()+" "
 	sub1=f"""#!/bin/bash
 # Slurm job options (job-name, compute nodes, job time)
-#SBATCH --nodes=1
+#SBATCH --nodes=4
 #SBATCH --ntasks-per-node=128
 #SBATCH --cpus-per-task=1
 #SBATCH --account={config.account}
@@ -149,7 +149,7 @@ echo "JOB DONE"
 """
 
 	with open(f"./run_dft{pop}/dft_continue{nn}", "w") as f:
-		if n_node>1:
+		if not config.check_one_by_one:
 			f.write(sub)
 		else:
 			f.write(sub1)
