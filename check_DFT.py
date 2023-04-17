@@ -34,6 +34,7 @@ for filename in os.listdir(output_dir):
 
 l='{'
 r='}'
+dd='\\'
 n_node=int(np.ceil(len(b.split())/config.nrun_per_node))
 n_job=n_node
 l0=b.split()
@@ -74,9 +75,9 @@ echo "Launching job number $index"
 # of memory required. A sensible amount is 1.5 GiB per task as
 # this leaves some overhead for the OS etc.
 
-srun --unbuffered --nodes=1 --ntasks={int(128/config.nrun_per_node)} --tasks-per-node={int(128/config.nrun_per_node)} \
-		--cpus-per-task=1 --distribution=block:block --hint=nomultithread \
-		--mem={int(200/config.nrun_per_node)}G --exact \
+srun --unbuffered --nodes=1 --ntasks={int(128/config.nrun_per_node)} --tasks-per-node={int(128/config.nrun_per_node)} {dd}
+		--cpus-per-task=1 --distribution=block:block --hint=nomultithread {dd}
+		--mem={int(200/config.nrun_per_node)}G --exact {dd}
 		pw.x < espresso_run_${l}index{r}.pwi > espresso_run_${l}index{r}.pwo &
 
 done
