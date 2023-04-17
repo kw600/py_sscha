@@ -35,21 +35,21 @@ for filename in os.listdir(output_dir):
 l='{'
 r='}'
 n_node=int(np.ceil(len(b.split())/config.nrun_per_node))
-n_job=int(np.ceil(n_node/4))
+n_job=n_node
 l0=b.split()
 nn=1
 for i in range(n_job):
 	index=''
-	if len(l0)>=64:
-		for j in range(64):
+	if len(l0)>=config.nrun_per_node:
+		for j in range(config.nrun_per_node):
 			index=index+l0.pop()+" "
 	else:
 		for j in range(len(l0)):
 			index=index+l0.pop()+" "
-	print('missing',index)
+	# print('missing',index)
 	sub=f"""#!/bin/bash
 # Slurm job options (job-name, compute nodes, job time)
-#SBATCH --nodes=4
+#SBATCH --nodes=1
 #SBATCH --account={config.account}
 #SBATCH --job-name={config.taskname}
 #SBATCH --partition=standard
