@@ -9,11 +9,13 @@ def collect_data(pop,N=-1):
 	directory = f"run_dft{pop}"
 	if N==-1:
 		output_filenames = [f for f in os.listdir(directory) if f.endswith(".pwo")] # We select only the output files
+		output_files = [os.path.join(directory, f) for f in output_filenames]
 		energies = np.zeros(len(output_files))
 	else:
 		output_filenames = [N]
+		output_files = [os.path.join(directory, f) for f in output_filenames]
 		energies = np.zeros((10000,))
-	output_files = [os.path.join(directory, f) for f in output_filenames] # We add the directory/outpufilename to load them correctly
+	 # We add the directory/outpufilename to load them correctly
 	# We prepare the array of energies
 	 
 	for file in output_files:
