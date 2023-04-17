@@ -61,7 +61,7 @@ if n_node==1:
 			index=index+l0.pop()+" "
 	sub1=f"""#!/bin/bash
 # Slurm job options (job-name, compute nodes, job time)
-#SBATCH --nodes=8
+#SBATCH --nodes=1
 #SBATCH --ntasks-per-node=128
 #SBATCH --cpus-per-task=1
 #SBATCH --account={config.account}
