@@ -6,5 +6,5 @@ for i in `seq 1 ${I}`
 do
 sbatch dft_continue$I
 done
-rm dft*
+rm dft_continue*
 cd ../
