@@ -53,17 +53,17 @@ echo "Starting 64 jobs across 4 nodes each using 16 CPUs"
 
 for i in $(seq 1 {config.n_node_per_job*config.nrun_per_node})
 do
-   index=$(((I-1)*{config.n_node_per_job*config.nrun_per_node}+i))
-   echo "Launching job number $i with index $index"
-   # Launch subjob overriding job settings as required and in the
-   # background. Make sure to change the `--mem=` flag to the amount
-   # of memory required. A sensible amount is 1.5 GiB per task as
-   # this leaves some overhead for the OS etc.
+index=$(((I-1)*{config.n_node_per_job*config.nrun_per_node}+i))
+echo "Launching job number $i with index $index"
+# Launch subjob overriding job settings as required and in the
+# background. Make sure to change the `--mem=` flag to the amount
+# of memory required. A sensible amount is 1.5 GiB per task as
+# this leaves some overhead for the OS etc.
 
-   srun --unbuffered --nodes=1 --ntasks={int(128/config.nrun_per_node)} --tasks-per-node={int(128/config.nrun_per_node)} {dd}
-        --cpus-per-task=1 --distribution=block:block --hint=nomultithread {dd}
-        --mem={int(200/config.nrun_per_node)}G --exact {dd}
-        pw.x < espresso_run_${l}index{r}.pwi > espresso_run_${l}index{r}.pwo &
+srun --unbuffered --nodes=1 --ntasks={int(128/config.nrun_per_node)} --tasks-per-node={int(128/config.nrun_per_node)} {dd}
+		--cpus-per-task=1 --distribution=block:block --hint=nomultithread {dd}
+		--mem={int(200/config.nrun_per_node)}G --exact {dd}
+		pw.x < espresso_run_${l}index{r}.pwi > espresso_run_${l}index{r}.pwo &
 
 done
 # Wait for all subjobs to finish
@@ -129,8 +129,10 @@ def check_complete1(output_dir,key='JOB DONE'):
 			try:
 				collect_data(pop,filename)
 			except:
+				print(filename)
 				a=filename.replace("_",".").split(".")
 				b+=a[-2]+" "
+			
 	if b=='':
 		return True, ''
 	else:
@@ -188,7 +190,7 @@ def DFT(pop):
 			time.sleep(30)
 	# print('2',check_complete1(DFT_path)[0])
 	while True:
-		if check_complete1(DFT_path)[0]:
+		if check_complete(DFT_path)[0]:
 			print("DFT calculations complete. Proceed to minimization.")
 			break
 		else:

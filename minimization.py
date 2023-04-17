@@ -10,11 +10,13 @@ def collect_data(pop,N=-1):
 	if N==-1:
 		output_filenames = [f for f in os.listdir(directory) if f.endswith(".pwo")] # We select only the output files
 	else:
-		output_filenames = N
+		output_filenames = [N]
+
 	output_files = [os.path.join(directory, f) for f in output_filenames] # We add the directory/outpufilename to load them correctly
 	# We prepare the array of energies
 	energies = np.zeros(len(output_files)) 
 	for file in output_files:
+			print(file)
 		# try:	
 			# Get the number of the configuration.
 			id_number = int(file.split("_")[-1].split(".")[0]) # The same as before, we need the to extract the configuration number from the filename
@@ -61,8 +63,8 @@ def collect_data(pop,N=-1):
 			np.savetxt(force_file, forces)
 			np.savetxt(stress_file, stress)
 		# except:
-		# 	print("Error: something went wrong with file {}".format(file))
-		# 	index=index+file.replace('_','.').split('.')[-2]
+			# print("Error: something went wrong with file {}".format(file))
+			# index=index+file.replace('_','.').split('.')[-2]
 	# Now we read all the configurations, we can save the energy file
 	energy_file = os.path.join(f"ens{pop}", f"energies_supercell_population{pop}.dat")
 	np.savetxt(energy_file, energies)
