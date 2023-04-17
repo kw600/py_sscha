@@ -132,7 +132,7 @@ def check_complete1(output_dir,key='JOB DONE'):
 				# print(filename)
 				a=filename.replace("_",".").split(".")
 				b+=a[-2]+" "
-			
+				# print(1,b)
 	if b=='':
 		return True, ''
 	else:
@@ -190,7 +190,7 @@ def DFT(pop):
 			time.sleep(30)
 	# print('2',check_complete1(DFT_path)[0])
 	while True:
-		if check_complete(DFT_path)[0]:
+		if check_complete1(DFT_path)[0]:
 			print("DFT calculations complete. Proceed to minimization.")
 			break
 		else:

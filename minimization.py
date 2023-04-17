@@ -66,8 +66,8 @@ def collect_data(pop,N=-1):
 			np.savetxt(force_file, forces)
 			np.savetxt(stress_file, stress)
 		# except:
-			# print("Error: something went wrong with file {}".format(file))
-			# index=index+file.replace('_','.').split('.')[-2]
+		# 	print("Error: something went wrong with file {}".format(file))
+		# 	index=index+file.replace('_','.').split('.')[-2]
 	# Now we read all the configurations, we can save the energy file
 	energy_file = os.path.join(f"ens{pop}", f"energies_supercell_population{pop}.dat")
 	np.savetxt(energy_file, energies)
