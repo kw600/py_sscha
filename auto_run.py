@@ -194,7 +194,7 @@ def DFT(pop):
 			print("DFT calculations complete. Proceed to minimization.")
 			break
 		else:
-			print(f"DFT calculations with index {check_complete(DFT_path)[1]} incomplete. ")
+			print(f"DFT calculations with index {check_complete1(DFT_path)[1]} incomplete. ")
 			try:
 				subprocess.run(["./step3",str(pop)])
 			except:

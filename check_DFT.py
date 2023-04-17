@@ -2,6 +2,7 @@ import os
 import config
 import sys
 import numpy as np
+from minimization import *
 # Specify the directory containing the output files
 pop=sys.argv[1]
 
@@ -17,20 +18,19 @@ for i in range(1, config.N_config+1):
 		# print(f"File {filename} does not exist.")
 		b+=str(i)+" "
 
+
+b=''
 # Loop through all the files in the directory
 for filename in os.listdir(output_dir):
 	# Check if the file is a text file
 	if filename.endswith(".pwo"):
-		
-		# Open the file and read its contents
-		with open(os.path.join(output_dir, filename), "r") as f:
-			contents = f.read()
-		# Check if the keyword "Job done" is in the file contents
-		if "JOB DONE" not in contents:
-			a=filename.replace("_",".")
-			a=a.split(".")
-			# If the keyword is not found, print the filename
+		try:
+			collect_data(pop,filename)
+		except:
+			print(filename)
+			a=filename.replace("_",".").split(".")
 			b+=a[-2]+" "
+
 
 l='{'
 r='}'

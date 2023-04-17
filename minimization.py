@@ -9,14 +9,15 @@ def collect_data(pop,N=-1):
 	directory = f"run_dft{pop}"
 	if N==-1:
 		output_filenames = [f for f in os.listdir(directory) if f.endswith(".pwo")] # We select only the output files
+		energies = np.zeros(len(output_files))
 	else:
 		output_filenames = [N]
-
+		energies = np.zeros((10000,))
 	output_files = [os.path.join(directory, f) for f in output_filenames] # We add the directory/outpufilename to load them correctly
 	# We prepare the array of energies
-	energies = np.zeros(len(output_files)) 
+	 
 	for file in output_files:
-			print(file)
+			# print(file)
 		# try:	
 			# Get the number of the configuration.
 			id_number = int(file.split("_")[-1].split(".")[0]) # The same as before, we need the to extract the configuration number from the filename
