@@ -4,6 +4,7 @@ import os
 taskname = 'scha1' #name of the task. Should be different if several auto_run.py are running at the same time 
 account = 'e89-ic_m' #account name
 #number of tasks per node. Please leave a space between '=' and number.
+n_node_per_job = 4
 nrun_per_node = 16 
 
 

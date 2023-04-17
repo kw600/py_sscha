@@ -32,7 +32,7 @@ echo 'JOB DONE'
 
 	s2=f"""#!/bin/bash
 # Slurm job options (job-name, compute nodes, job time)
-#SBATCH --nodes=4
+#SBATCH --nodes={config.n_node_per_job}
 #SBATCH --job-name={config.taskname}
 #SBATCH --account={config.account}
 #SBATCH --partition=standard
@@ -51,9 +51,9 @@ echo "Starting 64 jobs across 4 nodes each using 16 CPUs"
 
 # Loop over subjobs each using 16 CPUs, running in background
 
-for i in $(seq 1 {4*config.nrun_per_node})
+for i in $(seq 1 {config.n_node_per_job*config.nrun_per_node})
 do
-   index=$(((I-1)*{4*config.nrun_per_node}+i))
+   index=$(((I-1)*{config.n_node_per_job*config.nrun_per_node}+i))
    echo "Launching job number $i with index $index"
    # Launch subjob overriding job settings as required and in the
    # background. Make sure to change the `--mem=` flag to the amount
