@@ -195,7 +195,7 @@ def check_complete(output_dir,key='JOB DONE'):
 	else:
 		return False, b
 
-def check_complete1(output_dir,key='JOB DONE'):
+def check_complete1(pop,output_dir,key='JOB DONE'):
 	b=''
 	# Loop through all the files in the directory
 	for filename in os.listdir(output_dir):
