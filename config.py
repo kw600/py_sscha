@@ -5,7 +5,7 @@ taskname = 'scha1' #name of the task. Should be different if several auto_run.py
 account = 'e89-ic_m' #account name
 #number of tasks per node. Please leave a space between '=' and number.
 n_node_per_job = 1
-nrun_per_node = 16 
+nrun_per_node = 1
 one_by_one = True
 
 check_one_by_one = True

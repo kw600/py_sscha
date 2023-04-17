@@ -34,19 +34,6 @@ for filename in os.listdir(output_dir):
 			# If the keyword is not found, print the filename
 			b+=a[-2]+" "
 
-# b=''
-# # Loop through all the files in the directory
-# for filename in os.listdir(output_dir):
-# 	# Check if the file is a text file
-# 	if filename.endswith(".pwo"):
-# 		try:
-# 			collect_data(pop,filename)
-# 		except:
-# 			# print(filename)
-# 			a=filename.replace("_",".").split(".")
-# 			b+=a[-2]+" "
-
-
 l='{'
 r='}'
 dd='\\'
@@ -56,65 +43,20 @@ n_job=int(np.ceil(n_node/config.n_node_per_job))
 l0=b.split()
 print(l0)
 nn=1
-if len(l0)<32:
-
-	for j in range(len(l0)):
-		
-		sub1=f"""#!/bin/bash
+nrun=int(np.ceil(len(l0)/32))
+while len(l0)>0:	
+	index=''
+	if len(l0)>nrun:
+		for j in range(nrun):
+			index+=l0.pop()+','
+	else:
+		for j in range(len(l0)):
+			index+=l0.pop()+','
+	sub1=f"""#!/bin/bash
 # Slurm job options (job-name, compute nodes, job time)
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=128
 #SBATCH --cpus-per-task=1
-#SBATCH --account={config.account}
-#SBATCH --job-name={config.taskname}
-#SBATCH --partition=standard
-#SBATCH --qos=standard
-#SBATCH --time=01:0:0
-
-# Set the number of threads to 1
-#   This prevents any threaded system libraries from automatically
-#   using threading.
-export OMP_NUM_THREADS=1
-
-module load quantum_espresso
-I='{l0.pop()}'
-
-for index in $I
-do
-
-echo "Launching job number $index"
-
-# Launch subjob overriding job settings as required and in the
-# background. Make sure to change the `--mem=` flag to the amount
-# of memory required. A sensible amount is 1.5 GiB per task as
-# this leaves some overhead for the OS etc.
-
-srun  --distribution=block:block --hint=nomultithread pw.x < espresso_run_${l}index{r}.pwi > espresso_run_${l}index{r}.pwo 
-
-done
-# Wait for all subjobs to finish
-echo "Waiting for all jobs to finish ..."
-
-
-echo "JOB DONE"
-"""
-		with open(f"./run_dft{pop}/dft_continue{nn}", "w") as f:
-			f.write(sub1)
-		nn+=1
-else:
-	nn=1
-	for i in range(n_job):
-		index=''
-		if len(l0)>=config.n_node_per_job*config.nrun_per_node:
-			for j in range(config.nrun_per_node):
-				index=index+l0.pop()+" "
-		else:
-			for j in range(len(l0)):
-				index=index+l0.pop()+" "
-		# print('missing',index)
-		sub=f"""#!/bin/bash
-# Slurm job options (job-name, compute nodes, job time)
-#SBATCH --nodes={config.n_node_per_job}
 #SBATCH --account={config.account}
 #SBATCH --job-name={config.taskname}
 #SBATCH --partition=standard
@@ -139,23 +81,16 @@ echo "Launching job number $index"
 # of memory required. A sensible amount is 1.5 GiB per task as
 # this leaves some overhead for the OS etc.
 
-srun --unbuffered --nodes=1 --ntasks={int(128/config.nrun_per_node)} --tasks-per-node={int(128/config.nrun_per_node)} {dd}
-		--cpus-per-task=1 --distribution=block:block --hint=nomultithread {dd}
-		--mem={int(200/config.nrun_per_node)}G --exact {dd}
-		pw.x < espresso_run_${l}index{r}.pwi > espresso_run_${l}index{r}.pwo &
+srun  --distribution=block:block --hint=nomultithread pw.x < espresso_run_${l}index{r}.pwi > espresso_run_${l}index{r}.pwo 
 
 done
 # Wait for all subjobs to finish
 echo "Waiting for all jobs to finish ..."
 
-wait
 
 echo "JOB DONE"
-	"""
+"""
+	with open(f"./run_dft{pop}/dft_continue{nn}", "w") as f:
+			f.write(sub1)
+	nn+=1
 
-		with open(f"./run_dft{pop}/dft_continue{nn}", "w") as f:
-			
-				f.write(sub)
-			
-				
-		nn+=1
