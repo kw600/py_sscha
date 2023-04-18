@@ -9,6 +9,10 @@ cp ../sub_dft ./
 N1=`python -c "from math import ceil;print(ceil($N/$n2/$n1))"`
 for i in `seq 1 ${N1}`
 do
+mkdir -p d$i
+cd d$i
+cp ../*pwi ./
+cp ../sub_dft ./
 sbatch sub_dft $i
-sleep 1
+cd ..
 done	

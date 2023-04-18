@@ -75,13 +75,13 @@ echo "... all jobs finished"
 """
 	s3=f"""#!/bin/bash
 # Slurm job options (job-name, compute nodes, job time)
-#SBATCH --nodes={n_node_per_job}
+#SBATCH --nodes={config.n_node_per_job}
 #SBATCH --tasks-per-node=128
 #SBATCH --job-name={config.taskname}
 #SBATCH --account={config.account}
 #SBATCH --partition=standard
 #SBATCH --qos=taskfarm
-#SBATCH --time=02:00:00
+#SBATCH --time={config.hour}:00:00
 I=$1
 
 # Set the number of threads to 1
@@ -113,12 +113,12 @@ echo "... all jobs finished"
 
 	with open('sub_archer2', 'w') as f:
 		f.write(s1)
-	if config.one_by_one:
-		with open('sub_dft', 'w') as f:
-			f.write(s3)
-	else:
-		with open('sub_dft', 'w') as f:
-			f.write(s2)
+	
+	with open('sub_dft', 'w') as f:
+		f.write(s3)
+	# else:
+	# 	with open('sub_dft', 'w') as f:
+	# 		f.write(s2)
 
 def check_dft(output_dir):
 	n=0
@@ -261,6 +261,7 @@ def DFT(pop):
 	#check if the DFT calculations are finished
 	# print('1')
 	while True:
+		subprocess.run(["./collect_pwo",str(pop)])
 		if check_dft(DFT_path) and checkq()==1:
 			print("DFT calculations done. Check whether results are complete.")
 			break
@@ -274,6 +275,7 @@ def DFT(pop):
 			time.sleep(30)
 	# print('2',check_complete1(DFT_path)[0])
 	while True:
+		subprocess.run(["./collect_pwo",str(pop)])
 		(a,b)=check_complete(pop,DFT_path)
 		if a:
 			print("DFT calculations complete. Proceed to minimization.")

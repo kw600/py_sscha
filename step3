@@ -4,7 +4,11 @@ cd run_dft$1
 I=`ls dft_continue* | wc -l`
 for i in `seq 1 ${I}`
 do
+mkdir continue$i
+cp *pwi dft_continue$i continue$i
+cd continue$i
 sbatch dft_continue$i
+cd ..
 # sleep 20
 done
 mkdir -p sub_dir
