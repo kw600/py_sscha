@@ -41,7 +41,7 @@ dd='\\'
 l0=b.split()
 print(l0)
 nn=1
-nrun=int(np.ceil(len(l0)/32))
+nrun=int(np.ceil(len(l0)/16))
 while len(l0)>0:	
 	index=''
 	if len(l0)>nrun:
