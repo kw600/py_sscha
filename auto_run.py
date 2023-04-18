@@ -75,13 +75,13 @@ echo "... all jobs finished"
 """
 	s3=f"""#!/bin/bash
 # Slurm job options (job-name, compute nodes, job time)
-#SBATCH --nodes=1
+#SBATCH --nodes={n_node_per_job}
 #SBATCH --tasks-per-node=128
 #SBATCH --job-name={config.taskname}
 #SBATCH --account={config.account}
 #SBATCH --partition=standard
 #SBATCH --qos=taskfarm
-#SBATCH --time=01:00:00
+#SBATCH --time=02:00:00
 I=$1
 
 # Set the number of threads to 1

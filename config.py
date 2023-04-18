@@ -6,10 +6,11 @@ account = 'e89-ic_m' #account name
 #number of tasks per node. Please leave a space between '=' and number.
 n_node_per_job = 1
 nrun_per_node = 1
-one_by_one = True
+hour = '01'
 
-check_one_by_one = True
-check_node = 1
+# one_by_one = True
+# check_one_by_one = True
+
 
 cq = 0
 for root, dirs, files in os.walk("."):

@@ -7,6 +7,6 @@ do
 sbatch dft_continue$i
 # sleep 20
 done
-mkdir sub_dir
+mkdir -p sub_dir
 mv dft_continue* sub_dir
 cd ../

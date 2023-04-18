@@ -37,9 +37,7 @@ for filename in os.listdir(output_dir):
 l='{'
 r='}'
 dd='\\'
-n_node=int(np.ceil(len(b.split())/config.nrun_per_node))
 
-n_job=int(np.ceil(n_node/config.n_node_per_job))
 l0=b.split()
 print(l0)
 nn=1
@@ -48,20 +46,19 @@ while len(l0)>0:
 	index=''
 	if len(l0)>nrun:
 		for j in range(nrun):
-			index+=l0.pop()+','
+			index+=l0.pop()+' '
 	else:
 		for j in range(len(l0)):
-			index+=l0.pop()+','
+			index+=l0.pop()+' '
 	sub1=f"""#!/bin/bash
 # Slurm job options (job-name, compute nodes, job time)
-#SBATCH --nodes=1
+#SBATCH --nodes={config.n_node_per_job}
 #SBATCH --ntasks-per-node=128
-#SBATCH --cpus-per-task=1
 #SBATCH --account={config.account}
 #SBATCH --job-name={config.taskname}
 #SBATCH --partition=standard
-#SBATCH --qos=standard
-#SBATCH --time=01:0:0
+#SBATCH --qos=taskfarm
+#SBATCH --time={config.hour}:0:0
 
 # Set the number of threads to 1
 #   This prevents any threaded system libraries from automatically

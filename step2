@@ -11,4 +11,4 @@ for i in `seq 1 ${N1}`
 do
 sbatch sub_dft $i
 sleep 1
-done
+done	
