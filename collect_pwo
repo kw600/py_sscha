@@ -1,12 +1,12 @@
 #!/bin/bash
-if test -d "run_dft$1"; then
-  cd run_dft$1
-  a=`find ./ -name *pwo`
-  for i in $a
-    do
-      cp $i ./
-    done
-  cd ..
-else
-  echo "Directory 'run_dft$1' does not exist"
+cd run_dft$1
+for i in $(seq 1 32)
+do
+if test -d "d$i"; then
+cp d$i/*pwo ./ 2>/dev/null
 fi
+if test -d "continue$i"; then
+cp continue$i/*pwo ./ 2>/dev/null
+fi
+done
+cd ../

@@ -32,7 +32,7 @@ def generate_dft_input(pop):
 	tstress = .true.
 	tprnfor = .true.
 	disk_io = "none"
-	pseudo_dir = "pseudo_espresso"
+	pseudo_dir = "/work/e89/e89/kw2318/pseudo_espresso"
 &end
 &system
 	nat = {ensemble.structures[0].N_atoms}
