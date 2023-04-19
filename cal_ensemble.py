@@ -40,6 +40,7 @@ def generate_dft_input(pop):
 	ibrav = 0
 	ecutwfc = {config.ecutwfc_2}
 &end
+
 &electrons
 	conv_thr = {config.conv_thr_2}
 	!diagonalization = "cg"
@@ -48,9 +49,8 @@ def generate_dft_input(pop):
 ATOMIC_SPECIES
 	Pb 207.2 Pb.upf
 	Te 127.6 Te.upf
-
 K_POINTS automatic
-1 1 1 0 0 0
+8 8 8  0 0 0
 """
 	all_scf_files = [os.path.join(f"ens{pop}", f) for f in os.listdir(f"ens{pop}") if f.startswith("scf_")]
 
