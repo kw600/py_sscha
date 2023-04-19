@@ -80,7 +80,7 @@ def scha(pop):
 	IO_freq.SetupSaving(f"minim_info{pop}")
 
 	if pop == 1:
-			dyn = CC.Phonons.Phonons("harmonic_dyn", nqirr = config.nqirr)
+			dyn = CC.Phonons.Phonons(f"harmonic{config.nq1}{config.nq2}{config.nq3}_dyn", nqirr = config.nqirr)
 			dyn.Symmetrize()
 			dyn.ForcePositiveDefinite()
 	else:
@@ -95,10 +95,6 @@ def scha(pop):
 	# Ignore the structure minimization (is fixed by symmetry)
 	minimizer.minim_struct = False
 
-	# Setup the minimization parameter for the covariance matrix
-	minimizer.min_step_dyn = config.min_step_dyn # Values around 1 are good
-	#minimizer.precond_dyn = False
-	#minimizer.root_representation = "root2"
 
 	# Setup the threshold for the ensemble wasting
 	minimizer.kong_liu_ratio = config.kong_liu_ratio # Usually 0.5 is a good value
