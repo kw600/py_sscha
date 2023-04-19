@@ -4,16 +4,16 @@ import os
 taskname = 'scha1' #name of the task. Should be different if several auto_run.py are running at the same time 
 account = 'e89-ic_m' #account name
 #number of tasks per node. Please leave a space between '=' and number.
-n_node_per_job = 2
-nrun_per_node = 64
-hour = '01'
-one_by_one = False
+n_node_per_job = 1
+nrun_per_node = 32
+hour = '02'
+one_by_one = True
 
 
 #general
-nq1 = 2 #supercell size in each direction
-nq2 = 2
-nq3 = 2
+nq1 = 3 #supercell size in each direction
+nq2 = 3
+nq3 = 3
 T0 = 300
 
 cq = 0
@@ -41,4 +41,4 @@ conv_thr_2 = 1e-8
 
 #minimization
 #0.1 for the first few ensembles (with large FC gradients) and 0.5 for the later ones
-kong_liu_ratio = 0.1
+kong_liu_ratio = 0.2

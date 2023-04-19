@@ -3,6 +3,7 @@ import cellconstructor.Structure
 import cellconstructor.Phonons
 import sscha, sscha.Ensemble, sscha.SchaMinimizer, sscha.Relax
 import sys,os
+import numpy as np
 import config
 
 def generate_ensemble(pop):
@@ -26,6 +27,7 @@ def generate_ensemble(pop):
 
 def generate_dft_input(pop):
 	ensemble = generate_ensemble(pop)
+
 	typical_espresso_header = f"""
 &control
 	calculation = "scf"
@@ -50,7 +52,7 @@ ATOMIC_SPECIES
 	Pb 207.2 Pb.upf
 	Te 127.6 Te.upf
 K_POINTS automatic
-8 8 8  0 0 0
+{int(np.ceil(8/config.nq1))} {int(np.ceil(8/config.nq2))} {int(np.ceil(8/config.nq3))}  0 0 0
 """
 	all_scf_files = [os.path.join(f"ens{pop}", f) for f in os.listdir(f"ens{pop}") if f.startswith("scf_")]
 

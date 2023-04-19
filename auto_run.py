@@ -62,7 +62,7 @@ echo "Launching job number $i with index $index"
 
 srun --unbuffered --nodes=1 --ntasks={int(128/config.nrun_per_node)} --tasks-per-node={int(128/config.nrun_per_node)} {dd}
 		--cpus-per-task=1 --distribution=block:block --hint=nomultithread {dd}
-		--mem={int(200/config.nrun_per_node)}G --exact {dd}
+		--mem={int(250/config.nrun_per_node)}G --exact {dd}
 		pw.x < ../espresso_run_${l}index{r}.pwi > ../espresso_run_${l}index{r}.pwo &
 
 done
