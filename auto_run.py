@@ -193,16 +193,19 @@ def check_complete(pop,output_dir,key='JOB DONE'):
 		if filename.endswith(".pwo"):
 			
 			# Open the file and read its contents
-			with open('myfile.txt', 'r') as f:
-				last_line = f.readlines()[-1]
-				# print(last_line)
-				# Check if the keyword "Job done" is in the file contents
-				if key not in last_line:
-					a=filename.replace("_",".")
-					a=a.split(".")
-					# If the keyword is not found, print the filename
-					b+=a[-2]+" "
-					# print(b)
+			try:
+				with open(filename, 'r') as f:
+					last_line = f.readlines()[-1]
+					# Check if the keyword "Job done" is in the file contents
+					if key not in last_line:
+						a=filename.replace("_",".")
+						a=a.split(".")
+						# If the keyword is not found, print the filename
+						b+=a[-2]+" "
+			except:
+						a=filename.replace("_",".")
+						a=a.split(".")
+						b+=a[-2]+" "
 	if b=='':
 		return True, b
 	else:
@@ -239,7 +242,7 @@ def checkq():
 def DFT(pop):
 	current_path = os.getcwd()
 	if pop==1:
-		if not os.path.exists('./harmonic_dyn0'):
+		if not os.path.exists(f'./harmonic_{config.nq1}{config.nq2}{config.nq3}_dyn0'):
 			subprocess.run(["./step1"])
 			T=True
 		else:

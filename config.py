@@ -10,19 +10,21 @@ hour = '01'
 one_by_one = False
 
 
-cq = 0
-for root, dirs, files in os.walk("."):
-    for file in files:
-        if "harmonic_dyn" in file:
-            cq += 1
-nqirr = cq - 1 #number of irreducible q points
-
-
 #general
 nq1 = 2 #supercell size in each direction
 nq2 = 2
 nq3 = 2
 T0 = 300
+
+cq = 0
+for root, dirs, files in os.walk("."):
+    for file in files:
+        if f"harmonic_{nq1}{nq2}{nq3}_dyn" in file:
+            cq += 1
+nqirr = cq - 1 #number of irreducible q points
+
+
+
 
 
 # configurations for DFT calculations

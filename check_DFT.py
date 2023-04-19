@@ -23,15 +23,19 @@ for i in range(1, config.N_config+1):
 for filename in os.listdir(output_dir):
 	# Check if the file is a text file
 	if filename.endswith(".pwo"):
-		
-		# Open the file and read its contents
-		with open(os.path.join(output_dir, filename), "r") as f:
-			contents = f.read()
-		# Check if the keyword "Job done" is in the file contents
-		if 'JOB DONE' not in contents:
+		try:
+			# Open the file and read its contents
+			with open(os.path.join(output_dir, filename), "r") as f:
+				contents = f.read()
+			# Check if the keyword "Job done" is in the file contents
+			if 'JOB DONE' not in contents:
+				a=filename.replace("_",".")
+				a=a.split(".")
+				# If the keyword is not found, print the filename
+				b+=a[-2]+" "
+		except:
 			a=filename.replace("_",".")
 			a=a.split(".")
-			# If the keyword is not found, print the filename
 			b+=a[-2]+" "
 
 l='{'
@@ -58,7 +62,7 @@ while len(l0)>0:
 #SBATCH --job-name={config.taskname}
 #SBATCH --partition=standard
 #SBATCH --qos=taskfarm
-#SBATCH --time=0:10:0
+#SBATCH --time={config.hour}:00:0
 
 # Set the number of threads to 1
 #   This prevents any threaded system libraries from automatically

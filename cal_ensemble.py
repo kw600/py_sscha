@@ -7,7 +7,7 @@ import config
 
 def generate_ensemble(pop):
 	if pop == 1:
-		dyn = CC.Phonons.Phonons("harmonic_dyn", nqirr = config.nqirr)
+		dyn = CC.Phonons.Phonons(f"harmonic_{config.nq1}{config.nq2}{config.nq3}_dyn", nqirr = config.nqirr)
 	else:
 		dyn = CC.Phonons.Phonons(f"dyn_pop{pop-1}_", nqirr = config.nqirr)
 	
@@ -39,7 +39,6 @@ def generate_dft_input(pop):
 	ntyp = 2
 	ibrav = 0
 	ecutwfc = {config.ecutwfc_2}
-	ecutrho = {config.ecutrho_2}
 &end
 &electrons
 	conv_thr = {config.conv_thr_2}
