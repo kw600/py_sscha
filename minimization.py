@@ -80,7 +80,7 @@ def scha(pop):
 	IO_freq.SetupSaving(f"minim_info{pop}")
 
 	if pop == 1:
-			dyn = CC.Phonons.Phonons(f"harmonic{config.nq1}{config.nq2}{config.nq3}_dyn", nqirr = config.nqirr)
+			dyn = CC.Phonons.Phonons(f"harmonic_{config.nq1}{config.nq2}{config.nq3}_dyn", nqirr = config.nqirr)
 			dyn.Symmetrize()
 			dyn.ForcePositiveDefinite()
 	else:
