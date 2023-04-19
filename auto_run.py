@@ -37,7 +37,7 @@ echo 'JOB DONE'
 #SBATCH --account={config.account}
 #SBATCH --partition=standard
 #SBATCH --qos=standard
-#SBATCH --time=01:00:00
+#SBATCH --time=0:30:00
 I=$1
 
 # Set the number of threads to 1
@@ -63,7 +63,7 @@ echo "Launching job number $i with index $index"
 srun --unbuffered --nodes=1 --ntasks={int(128/config.nrun_per_node)} --tasks-per-node={int(128/config.nrun_per_node)} {dd}
 		--cpus-per-task=1 --distribution=block:block --hint=nomultithread {dd}
 		--mem={int(200/config.nrun_per_node)}G --exact {dd}
-		pw.x < espresso_run_${l}index{r}.pwi > ../espresso_run_${l}index{r}.pwo &
+		pw.x < ../espresso_run_${l}index{r}.pwi > ../espresso_run_${l}index{r}.pwo &
 
 done
 # Wait for all subjobs to finish
@@ -104,7 +104,7 @@ echo "Launching job number $i with index $index"
 # this leaves some overhead for the OS etc.
 
 srun --distribution=block:block --hint=nomultithread {dd}
-		pw.x < espresso_run_${l}index{r}.pwi > ../espresso_run_${l}index{r}.pwo 
+		pw.x < ../espresso_run_${l}index{r}.pwi > ../espresso_run_${l}index{r}.pwo 
 
 done
 
@@ -115,7 +115,10 @@ echo "... all jobs finished"
 		f.write(s1)
 	
 	with open('sub_dft', 'w') as f:
-		f.write(s3)
+		if config.one_by_one==True:
+			f.write(s2)
+		else:
+			f.write(s3)
 	# else:
 	# 	with open('sub_dft', 'w') as f:
 	# 		f.write(s2)
@@ -190,15 +193,16 @@ def check_complete(pop,output_dir,key='JOB DONE'):
 		if filename.endswith(".pwo"):
 			
 			# Open the file and read its contents
-			with open(os.path.join(output_dir, filename), "r") as f:
-				contents = f.read()
-			# Check if the keyword "Job done" is in the file contents
-			if key not in contents:
-				a=filename.replace("_",".")
-				a=a.split(".")
-				# If the keyword is not found, print the filename
-				b+=a[-2]+" "
-				# print(b)
+			with open('myfile.txt', 'r') as f:
+				last_line = f.readlines()[-1]
+				# print(last_line)
+				# Check if the keyword "Job done" is in the file contents
+				if key not in last_line:
+					a=filename.replace("_",".")
+					a=a.split(".")
+					# If the keyword is not found, print the filename
+					b+=a[-2]+" "
+					# print(b)
 	if b=='':
 		return True, b
 	else:
@@ -261,7 +265,7 @@ def DFT(pop):
 	#check if the DFT calculations are finished
 	# print('1')
 	while True:
-		subprocess.run(["./collect_pwo",str(pop)])
+		# subprocess.run(["./collect_pwo",str(pop)])
 		if check_dft(DFT_path) and checkq()==1:
 			print("DFT calculations done. Check whether results are complete.")
 			break
@@ -275,7 +279,7 @@ def DFT(pop):
 			time.sleep(30)
 	# print('2',check_complete1(DFT_path)[0])
 	while True:
-		subprocess.run(["./collect_pwo",str(pop)])
+		# subprocess.run(["./collect_pwo",str(pop)])
 		(a,b)=check_complete(pop,DFT_path)
 		if a:
 			print("DFT calculations complete. Proceed to minimization.")

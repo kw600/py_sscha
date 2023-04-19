@@ -58,7 +58,7 @@ while len(l0)>0:
 #SBATCH --job-name={config.taskname}
 #SBATCH --partition=standard
 #SBATCH --qos=taskfarm
-#SBATCH --time={config.hour}:0:0
+#SBATCH --time=0:10:0
 
 # Set the number of threads to 1
 #   This prevents any threaded system libraries from automatically
@@ -78,7 +78,7 @@ echo "Launching job number $index"
 # of memory required. A sensible amount is 1.5 GiB per task as
 # this leaves some overhead for the OS etc.
 
-srun  --distribution=block:block --hint=nomultithread pw.x < ../espresso_run_${l}index{r}.pwi > espresso_run_${l}index{r}.pwo 
+srun  --distribution=block:block --hint=nomultithread pw.x < ../espresso_run_${l}index{r}.pwi > ../espresso_run_${l}index{r}.pwo 
 
 done
 # Wait for all subjobs to finish

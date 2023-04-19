@@ -7,7 +7,7 @@ account = 'e89-ic_m' #account name
 n_node_per_job = 1
 nrun_per_node = 16
 hour = '01'
-
+one_by_one = False
 
 
 
@@ -21,9 +21,9 @@ nqirr = cq - 1 #number of irreducible q points
 
 
 #general
-nq1 = 2 #supercell size in each direction
-nq2 = 2
-nq3 = 2
+nq1 = 3 #supercell size in each direction
+nq2 = 3
+nq3 = 3
 T0 = 100
 
 #step1 initial relaxation
