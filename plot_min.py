@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Path to the file containing the results
-f = np.loadtxt("m.dat")
+f = np.loadtxt("min_222.dat")
 label=['Free energy','FC gradient','Kong-Liu N_eff']
 count=0
 for i in [0,2,6]:

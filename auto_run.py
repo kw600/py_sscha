@@ -115,7 +115,7 @@ echo "... all jobs finished"
 		f.write(s1)
 	
 	with open('sub_dft', 'w') as f:
-		if config.one_by_one==True:
+		if config.one_by_one==False:
 			f.write(s2)
 		else:
 			f.write(s3)
