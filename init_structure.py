@@ -36,38 +36,56 @@ class structure():
 		self.primitive = get_primitive(self.unitcell)
 		
 	def generate_input_for_initial_relax(self):
-		pseudos = {"Pb": "Pb.upf","Te": "Te.upf"}
+		pw_input = f"""
+&CONTROL
+   calculation      = 'vc-relax'
+   tstress          = .true.
+   tprnfor          = .true.
+   pseudo_dir       = '/work/e89/e89/kw2318/pseudo_espresso'
+/
+&SYSTEM
+   ecutwfc          = 65
+   ntyp             = 2
+   nat              = 2
+   ibrav            = 0
+/
+&ELECTRONS
+   conv_thr         = 1e-08
+/
+&IONS
+/
+&CELL
+/
 
-		# Now we define the parameters for the espresso calculations
-		input_params = {"calculation" : "vc-relax", # The type of calculation
-					"ecutwfc" : config.ecutwfc, # The plane-wave wave-function cutoff
-					"ecutrho": config.ecutrho, # The density wave-function cutoff,
-				"conv_thr": config.conv_thr, # The convergence for the DFT self-consistency
-				"pseudo_dir" : "pseudo_espresso", # The directory of the pseudo potentials
-				"tprnfor" : True, # Print the forces
-				"tstress" : True # Print the stress tensor
-				}
+ATOMIC_SPECIES
+Pb 207.2 Pb_ONCV_PBE-1.2.upf
+Te 127.6 Te_ONCV_PBE-1.2.upf
 
-		k_spacing = config.k_spacing #A^-1 The minimum distance in the Brillouin zone sampling
+K_POINTS automatic
+8 8 8  0 0 0
 
-		# espresso_calc = Espresso(input_data = input_params, pseudopotentials = pseudos, kspacing = k_spacing)
-		self.primitive.write('espresso.pwi',input_data = input_params, pseudopotentials = pseudos, kspacing = k_spacing)
-
+CELL_PARAMETERS angstrom
+3.275 3.275 0
+3.275 -3.275 0
+3.275 0 3.275
+"""
+		with open("espresso.phi", "w") as f:
+				f.write(pw_input)
 	def generate_input_for_initial_phonon(self):
 		ph_input = f"""
-					&inputph
-						! the final filename
-						fildyn = "harmonic_dyn"
-						
-						! the q mesh
-						ldisp = .true.
-						nq1 = {config.nq1} 
-						nq2 = {config.nq2} 
-						nq3 = {config.nq3} 
-						
-						! compute also the effective charges and the dielectric tensor
-						epsil = .true.
-					&end
+&inputph
+	! the final filename
+	fildyn = "harmonic_dyn"
+	
+	! the q mesh
+	ldisp = .true.
+	nq1 = {config.nq1} 
+	nq2 = {config.nq2} 
+	nq3 = {config.nq3} 
+	
+	! compute also the effective charges and the dielectric tensor
+	epsil = .true.
+&end
 					"""
 					# We write the input script and execute the phonon calculation program
 		with open("harmonic.phi", "w") as f:

@@ -37,7 +37,7 @@ echo 'JOB DONE'
 #SBATCH --account={config.account}
 #SBATCH --partition=standard
 #SBATCH --qos=standard
-#SBATCH --time=0:30:00
+#SBATCH --time={config.hour}:00:00
 I=$1
 
 # Set the number of threads to 1
