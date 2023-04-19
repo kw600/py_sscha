@@ -48,7 +48,7 @@ dd='\\'
 l0=b.split()
 print(len(l0))
 nn=1
-nrun=int(np.ceil(len(l0)/16))
+nrun=int(np.ceil(len(l0)/32))
 while len(l0)>0:	
 	index=''
 	if len(l0)>nrun:
@@ -59,7 +59,7 @@ while len(l0)>0:
 			index+=l0.pop()+' '
 	sub1=f"""#!/bin/bash
 # Slurm job options (job-name, compute nodes, job time)
-#SBATCH --nodes=1
+#SBATCH --nodes=4
 #SBATCH --ntasks-per-node=128
 #SBATCH --account={config.account}
 #SBATCH --job-name={config.taskname}
