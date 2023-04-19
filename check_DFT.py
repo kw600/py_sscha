@@ -26,14 +26,17 @@ for filename in os.listdir(output_dir):
 		try:
 			# Open the file and read its contents
 			with open(os.path.join(output_dir, filename), "r") as f:
-				contents = f.read()
-			# Check if the keyword "Job done" is in the file contents
-			if 'JOB DONE' not in contents:
-				a=filename.replace("_",".")
-				a=a.split(".")
-				# If the keyword is not found, print the filename
-				b+=a[-2]+" "
+				contents = f.readlines()[-2]
+				# print(contents)
+				# print(filename)
+				# exit()
+				if 'JOB DONE' not in contents:
+					a=filename.replace("_",".")
+					a=a.split(".")
+					# If the keyword is not found, print the filename
+					b+=a[-2]+" "
 		except:
+			
 			a=filename.replace("_",".")
 			a=a.split(".")
 			b+=a[-2]+" "
@@ -43,7 +46,7 @@ r='}'
 dd='\\'
 
 l0=b.split()
-print(l0)
+print(len(l0))
 nn=1
 nrun=int(np.ceil(len(l0)/16))
 while len(l0)>0:	
@@ -56,7 +59,7 @@ while len(l0)>0:
 			index+=l0.pop()+' '
 	sub1=f"""#!/bin/bash
 # Slurm job options (job-name, compute nodes, job time)
-#SBATCH --nodes={config.n_node_per_job}
+#SBATCH --nodes=1
 #SBATCH --ntasks-per-node=128
 #SBATCH --account={config.account}
 #SBATCH --job-name={config.taskname}

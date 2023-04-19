@@ -142,39 +142,6 @@ def check_dft(output_dir):
 		
 		return False
 
-def check_complete2(pop,path):
-	b=''
-	directory = f"run_dft{pop}"
-	energies = np.zeros((10000,))
-	print(file)
-	for file in os.listdir(path):
-		if file.endswith(".pwo"):
-			id_number = int(file.split("_")[-1].split(".")[0])
-			try:
-				# The same as before, we need the to extract the configuration number from the filename
-				ff = open(file, "r")
-				lines = [l.strip() for l in ff.readlines()] # Read the whole file removing tailoring spaces
-				ff.close()
-				energy_line = next(l for l in lines if len(l) > 0 if l.split()[0] == "!")
-				energies[id_number - 1] = float(energy_line.split()[4])
-				nat_line = next( l for l in lines if len(l) > 0 if l.split()[0] == "number" and l.split()[2] == "atoms/cell" )
-				nat = int(nat_line.split()[4])
-				forces = np.zeros((nat, 3))
-				forces_lines = [l for l in lines if len(l) > 0 if l.split()[0] == "atom"] # All the lines that starts with atom will contain a force
-				for i in range(nat):
-					forces[i, :] = [float(x) for x in forces_lines[i].split()[-3:]] # Get the last three number from the line containing the force
-				stress = np.zeros((3,3))
-				index_before_stress = next(i for i, l in enumerate(lines) if len(l) > 0 if l.split()[0] == "total" and l.split()[1] == "stress")
-				for i in range(3):
-					index = i + index_before_stress + 1
-					stress[i, :] = [float(x) for x in lines[index].split()[:3]]
-			except:
-				b = b + id_number + ' '
-	if b=='':
-		return True, b
-	else:
-		return False, b
-	
 
 
 def check_complete(pop,output_dir,key='JOB DONE'):
@@ -191,13 +158,12 @@ def check_complete(pop,output_dir,key='JOB DONE'):
 	for filename in os.listdir(output_dir):
 		# Check if the file is a text file
 		if filename.endswith(".pwo"):
-			
-			# Open the file and read its contents
 			try:
-				with open(filename, 'r') as f:
-					last_line = f.readlines()[-1]
+				with open(os.path.join(output_dir, filename), "r") as f:
+					last_line = f.readlines()[-2]
 					# Check if the keyword "Job done" is in the file contents
 					if key not in last_line:
+						# print(filename,);exit()
 						a=filename.replace("_",".")
 						a=a.split(".")
 						# If the keyword is not found, print the filename
@@ -211,23 +177,7 @@ def check_complete(pop,output_dir,key='JOB DONE'):
 	else:
 		return False, b
 
-def check_complete1(pop,output_dir,key='JOB DONE'):
-	b=''
-	# Loop through all the files in the directory
-	for filename in os.listdir(output_dir):
-		# Check if the file is a text file
-		if filename.endswith(".pwo"):
-			try:
-				collect_data(pop,filename)
-			except:
-				# print(filename)
-				a=filename.replace("_",".").split(".")
-				b+=a[-2]+" "
-				# print(1,b)
-	if b=='':
-		return True, ''
-	else:
-		return False, b
+
 
 def checkq():
 	subprocess.run(["./queue"])
