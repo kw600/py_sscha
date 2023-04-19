@@ -55,6 +55,7 @@ class structure():
 &IONS
 /
 &CELL
+press = 300
 /
 
 ATOMIC_SPECIES
@@ -71,7 +72,7 @@ CELL_PARAMETERS angstrom
 
 ATOMIC_POSITIONS angstrom
 Pb 0.0000000000 0.0000000000 0.0000000000
-Te 3.1700000000 0.0000000000 0.0000000000
+Te 3.27500000000 0.0000000000 0.0000000000
 """
 		with open("espresso.phi", "w") as f:
 				f.write(pw_input)
