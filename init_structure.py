@@ -68,6 +68,10 @@ CELL_PARAMETERS angstrom
 3.275 3.275 0
 3.275 -3.275 0
 3.275 0 3.275
+
+ATOMIC_POSITIONS angstrom
+Pb 0.0000000000 0.0000000000 0.0000000000
+Te 3.1700000000 0.0000000000 0.0000000000
 """
 		with open("espresso.phi", "w") as f:
 				f.write(pw_input)
