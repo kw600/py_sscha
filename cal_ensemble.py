@@ -49,8 +49,8 @@ def generate_dft_input(pop):
 &end
 
 ATOMIC_SPECIES
-	Pb 207.2 Pb.upf
-	Te 127.6 Te.upf
+Pb 207.2 Pb_ONCV_PBE-1.2.upf
+Te 127.6 Te_ONCV_PBE-1.2.upf
 K_POINTS automatic
 {int(np.ceil(8/config.nq1))} {int(np.ceil(8/config.nq2))} {int(np.ceil(8/config.nq3))}  0 0 0
 """
