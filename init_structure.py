@@ -55,7 +55,6 @@ class structure():
 &IONS
 /
 &CELL
-press = 300
 /
 
 ATOMIC_SPECIES
