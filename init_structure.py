@@ -73,13 +73,13 @@ ATOMIC_POSITIONS angstrom
 Pb 0.00000000000 0.0000000000 0.0000000000
 Te 3.27500000000 3.2750000000 3.2750000000
 """
-		with open("espresso.phi", "w") as f:
+		with open("espresso.pwi", "w") as f:
 				f.write(pw_input)
 	def generate_input_for_initial_phonon(self):
 		ph_input = f"""
 &inputph
 	! the final filename
-	fildyn = "harmonic_dyn"
+	fildyn = "harmonic_{config.nq1}{config.nq2}{config.nq3}_dyn"
 	
 	! the q mesh
 	ldisp = .true.
