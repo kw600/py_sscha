@@ -45,7 +45,6 @@ def generate_dft_input(pop):
 
 &electrons
 	conv_thr = {config.conv_thr_2}
-	!diagonalization = "cg"
 &end
 
 ATOMIC_SPECIES

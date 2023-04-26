@@ -212,7 +212,7 @@ def DFT(pop):
 	#run the step2
 	if check_dft(DFT_path):
 		pass
-	else:
+	elif checkq()==1:
 		subprocess.run(["./step2",str(pop)])
 
 	#check if the DFT calculations are finished
