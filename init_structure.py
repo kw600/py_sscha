@@ -8,26 +8,26 @@ import cellconstructor.Phonons
 
 import config
 
-# def init_structure(filename):
-# 	stru = ase.io.read(filename)
-# 	return stru
+def init_structure(filename):
+	stru = ase.io.read(filename)
+	return stru
 
-# def get_primitive(unitcell):
-# 	struct = CC.Structure.Structure()
-# 	struct.generate_from_ase_atoms(unitcell)
+def get_primitive(unitcell):
+	struct = CC.Structure.Structure()
+	struct.generate_from_ase_atoms(unitcell)
 
-# 	# Define the new unit cell
-# 	new_cell = struct.unit_cell.copy()
-# 	new_cell[0,:] = .5 * struct.unit_cell[1,:] + .5*struct.unit_cell[2,:]
-# 	new_cell[1,:] = .5 * struct.unit_cell[0,:] + .5*struct.unit_cell[2,:]
-# 	new_cell[2,:] = .5 * struct.unit_cell[0,:] + .5*struct.unit_cell[1,:]
+	# Define the new unit cell
+	new_cell = struct.unit_cell.copy()
+	new_cell[0,:] = .5 * struct.unit_cell[1,:] + .5*struct.unit_cell[2,:]
+	new_cell[1,:] = .5 * struct.unit_cell[0,:] + .5*struct.unit_cell[2,:]
+	new_cell[2,:] = .5 * struct.unit_cell[0,:] + .5*struct.unit_cell[1,:]
 
-# 	# Apply the new unit cell to the structure
-# 	# And remove duplicated atoms
-# 	struct.unit_cell = new_cell
-# 	struct.fix_coords_in_unit_cell()
-# 	primitive = struct.get_ase_atoms()
-# 	return primitive
+	# Apply the new unit cell to the structure
+	# And remove duplicated atoms
+	struct.unit_cell = new_cell
+	struct.fix_coords_in_unit_cell()
+	primitive = struct.get_ase_atoms()
+	return primitive
 
 class structure():
 	def __init__(self, filename):
