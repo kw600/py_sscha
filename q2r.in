@@ -1,0 +1,5 @@
+&input
+ fildyn='dyn_pop3_',
+ zasr='simple',
+ flfrc='pbte.333.fc'
+/

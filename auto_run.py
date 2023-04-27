@@ -135,19 +135,15 @@ def DFT(pop):
 
 if __name__ == '__main__':
 	
-	converge = False
-	pop = 1
-	while not converge:
-		DFT(pop)
+	# converge = False
+	# pop = 1
+	# while not converge:
+
+		pop=int(sys.argv[1])
+
 		collect_data(pop)
-
-
-		print('nqirr',config.nqirr)
 		converge=scha(pop)
-		pop+=1
-		if pop>config.maxpop:
-			print("Maximum population reached. Please check the results.")
-			break
+
 
 
 

@@ -1,4 +1,8 @@
 #!/bin/bash
+if [ -d 'run_dft$1' ]; then 
+	echo "run_dft$1 exists, please delete it first"
+    exit  
+fi 
 python generate_init_input.py
 python cal_ensemble.py $1
 N=`grep 'N_config' config.py | awk '{print $NF}'`
