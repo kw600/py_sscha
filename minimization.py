@@ -107,9 +107,10 @@ def scha(pop):
 	print('Converged?',minimizer.is_converged())
 	return minimizer.is_converged()
 
-# if __name__ == "__main__":
-# 	collect_data(pop)
-# 	min=scha(pop)
+if __name__ == "__main__":
+	pop=int(sys.argv[1])
+	collect_data(pop)
+	min=scha(pop)
 	
 
 	
