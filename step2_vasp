@@ -1,0 +1,10 @@
+#!/bin/bash
+for i in `seq 1 10`
+	do
+        # mkdir vasp$i
+        cp INCAR KPOINTS POTCAR vasp$i
+        cp sub_dft vasp$i
+        cd vasp$i
+        sbatch sub_dft
+        cd ..
+    done

@@ -115,6 +115,28 @@ done
 echo "... all jobs finished"
 """
 
+	s4=f"""#!/bin/bash
+#SBATCH -A MONSERRAT-SL4-CPU
+#SBATCH -p icelake
+#SBATCH -N {config.n_node_per_job}
+#SBATCH -n 76
+#SBATCH -t {config.hour}:00:00
+#SBATCH -J {config.taskname}
+module list
+
+module load intel/compilers/2020.4 intel/mkl/2020.4 intel/impi/2020.4/intel intel/libs/idb/2020.4 intel/libs/tbb/2020.4 intel/libs/ipp/2020.4 intel/libs/daal/2020.4 intel/bundles/complib/2020.4 gcc-5.4.0-gcc-4.8.5-fis24gg gcc-7.2.0-gcc-4.8.5-pqn7o2k
+export PATH=/home/kw600/qe-6.6/bin:$PATH
+
+module unload -f intel-oneapi-mpi/2021.6.0/intel/guxuvcpm  intel-oneapi-compilers/2022.1.0/gcc/b6zld2mz
+
+
+mpirun vasp_std 
+
+
+echo "... all jobs finished"
+"""
+
+
 	with open('sub_archer2', 'w') as f:
 		f.write(s1)
 	
@@ -122,14 +144,11 @@ echo "... all jobs finished"
 		if config.one_by_one==False:
 			f.write(s2)
 		else:
-			f.write(s3)
+			f.write(s4)
 
-def sscha():
-	PbTe_atoms = structure("PbTe.cif")
-	PbTe_atoms.generate_input_for_initial_relax()
-	PbTe_atoms.generate_input_for_initial_phonon()
-	write_sub()
+
+	
 if __name__ == "__main__":
-    sscha()
+    write_sub()
 
 

@@ -44,7 +44,7 @@ def generate_dft_input(pop):
 &end
 
 &electrons
-	conv_thr = {config.conv_thr_2}
+	conv_thr =  1d-6
 &end
 
 ATOMIC_SPECIES
@@ -79,12 +79,58 @@ K_POINTS automatic
 			f.writelines(structure_lines)
 	return ensemble
 
+def generate_vasp_input(pop):
+	ensemble = generate_ensemble(pop)
+	all_scf_files = [os.path.join(f"ens{pop}", f) for f in os.listdir(f"ens{pop}") if f.startswith("scf_")]
+	if not os.path.exists(f"run_dft{pop}"):
+		os.mkdir(f"run_dft{pop}")
 
+	for i,file in enumerate(all_scf_files):
+		if not os.path.exists(f"run_dft{pop}/vasp{i+1}"):
+			os.mkdir(f"run_dft{pop}/vasp{i+1}")
+		number = int(file.split("_")[-1].split(".")[0])
+		filename = os.path.join(f"run_dft{pop}/vasp{i+1}", "POSCAR".format(number))
+		
+		# We start writing the file
+		with open(filename, "w") as f:
+			
+			# Load the scf_population_X.dat file
+			ff = open(file, "r")
+			structure_lines = ff.readlines()
+			lattice = np.array([i.split() for i in structure_lines[1:4]],dtype=float)
+			atoms   = structure_lines[6:]
+			sc_lines = []
+			v_lines = []
+			sn_lines = []
+			for line in atoms:
+				if line.startswith('Sc'):
+					sc_lines.append(line)
+				elif line.startswith('V'):
+					v_lines.append(line)
+				elif line.startswith('Sn'):
+					sn_lines.append(line)
+			ff.close()
+			f.writelines('ScV6Sn6 2 by 2 by 2\n   1.00000000000000\n')
+			f.writelines(structure_lines[1:4])
+			f.writelines('   Sc   V    Sn\n     8     48     48\nDirect\n')
+			for i in sc_lines:
+				coord = np.array(i.split()[1:],dtype=float)
+				frac = np.dot(np.linalg.inv(lattice),coord)
+				f.write(f'{frac[0]}  {frac[1]}  {frac[2]}\n')
+			for i in v_lines:
+				coord = np.array(i.split()[1:],dtype=float)
+				frac = np.dot(np.linalg.inv(lattice),coord)
+				f.write(f'{frac[0]}  {frac[1]}  {frac[2]}\n')
+			for i in sn_lines:
+				coord = np.array(i.split()[1:],dtype=float)
+				frac = np.dot(np.linalg.inv(lattice),coord)
+				f.write(f'{frac[0]}  {frac[1]}  {frac[2]}\n')
+	return ensemble
 
 if __name__ == "__main__":
 	
 	pop = int(sys.argv[1])
-	generate_dft_input(pop)
+	generate_vasp_input(pop)
 
 
 
