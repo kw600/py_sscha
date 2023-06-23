@@ -4,43 +4,39 @@ import cellconstructor as CC
 import sscha, sscha.Ensemble, sscha.SchaMinimizer, sscha.Relax
 import config
 
-def collect_data(pop,N=-1):
+def collect_data(pop,Test=False):
+    """
+    COLLECT DATA
+    ============
+    This method collects the data from the DFT calculations. It reads the output files and collect the energies and forces.
+
+    Parameters
+    ----------
+        pop : int
+            This is the index of the ensemble.
+    """
     index=''
     directory = f"run_dft{pop}"
-    if N==-1:
-        output_filenames = [f for f in os.listdir(directory) if f.endswith(".pwo")] # We select only the output files
-        output_files = [os.path.join(directory, f) for f in output_filenames]
-        energies = np.zeros(len(output_files))
-    else:
-        output_filenames = [N]
-        output_files = [os.path.join(directory, f) for f in output_filenames]
-        energies = np.zeros((10000,))
-     # We add the directory/outpufilename to load them correctly
+   
+    output_filenames = [f for f in os.listdir(directory) if f.endswith(".pwo")] # We select only the output files
+    output_files = [os.path.join(directory, f) for f in output_filenames]
+    energies = np.zeros(len(output_files))
+
+    # We add the directory/outpufilename to load them correctly
     # We prepare the array of energies
      
     for file in output_files:
             # print(file)
         try:	
             # Get the number of the configuration.
-            id_number = int(file.split("_")[-1].split(".")[0]) # The same as before, we need the to extract the configuration number from the filename
-            
-            # Load the file
+            id_number = int(file.split("_")[-1].split(".")[0]) # The same as before, we need the to extract the configuration number from the 
             ff = open(file, "r")
             lines = [l.strip() for l in ff.readlines()] # Read the whole file removing tailoring spaces
             ff.close()
-            
-            # Lets look for the energy (in espresso the first line that starts with !)
-            # next is used to find only the first occurrence
-            #try:
             energy_line = next(l for l in lines if len(l) > 0 if l.split()[0] == "!")
-            #except:
-            #	print("Error: no energy found in file {}".format(file))
-            # Lets collect the energy (the actual number is the 5th item on the line, but python indexes start from 0)
-            # note, also the id_number are saved starting from 1
             energies[id_number - 1] = float(energy_line.split()[4])
             
             # Now we can collect the force
-            # We need the number of atoms
             nat_line = next( l for l in lines if len(l) > 0 if l.split()[0] == "number" and l.split()[2] == "atoms/cell" )
             nat = int(nat_line.split()[4])
             #except:
@@ -72,49 +68,90 @@ def collect_data(pop,N=-1):
     energy_file = os.path.join(f"ens{pop}", f"energies_supercell_population{pop}.dat")
     np.savetxt(energy_file, energies)
 
-def collect_vaspdata(pop,N=-1):
-    index=''
-    directory = f"run_dft{pop}"
-    if N==-1:
-        output_filenames = [f'espresso_run_{i}.pwo' for i in range(1,1+config.N_config)] # We select only the output files
-        output_files = [os.path.join(directory, f) for f in output_filenames]
-        energies = np.zeros(len(output_files))
-    else:
-        output_filenames = [N]
-        output_files = [os.path.join(directory, f) for f in output_filenames]
-        energies = np.zeros((10000,))
-     # We add the directory/outpufilename to load them correctly
-    # We prepare the array of energies
-     
-    for file in output_files:
-            # print(file)
-        try:	
-            # Get the number of the configuration.
-            id_number = int(file.split("_")[-1].split(".")[0]) # The same as 
-            ff = open(file, "r")
-            lines = [l.strip() for l in ff.readlines()] # Read the whole file
-            ff.close()
-            energy_line = next(l for l in lines if len(l) > 0 if l.split()[0] == "!")
-            energies[id_number - 1] = float(energy_line.split()[4])
-            nat_line = next( l for l in lines if len(l) > 0 if l.split()[0] == "number" and l.split()[2] == "atoms/cell" )
-            nat = int(nat_line.split()[4])
-            forces = np.zeros((nat, 3))
-            forces_lines = [l for l in lines if len(l) > 0 if l.split()[0] == "atom"] # All the lines that starts with atom will contain a force
-            for i in range(nat):
-                forces[i, :] = [float(x) for x in forces_lines[i].split()[-3:]]
-            stress = np.zeros((3,3))
-            index_before_stress = next(i for i, l in enumerate(lines) if len(l) > 0 if l.split()[0] == "total" and l.split()[1] == "stress")
-            for i in range(3):
-                index = i + index_before_stress + 1
-                stress[i, :] = [float(x) for x in lines[index].split()[:3]]
-            force_file = os.path.join(f"ens{pop}", "forces_population{}_{}.dat".format(pop,id_number))
-            stress_file = os.path.join(f"ens{pop}", "pressures_population{}_{}.dat".format(pop,id_number))
-            np.savetxt(force_file, forces)
-            np.savetxt(stress_file, stress)
-        except:
-            print("Error: something went wrong with file {}".format(file))
-    energy_file = os.path.join(f"ens{pop}", f"energies_supercell_population{pop}.dat")
-    np.savetxt(energy_file, energies)
+def collect_vaspdata(pop):
+    """
+    COLLECT VASP DATA
+    ============
+    This method collects the data from the VASP calculations. It reads the output files and collect the energies and forces and finally transform them into QE format.
+
+    Parameters
+    ----------
+        pop : int
+            This is the index of the ensemble.
+    """
+    N_config = config.N_config
+    N_prim = config.N_prim
+    N_supercell=config.nq1*config.nq2*config.nq3
+    f=open(f'./energies_supercell_population{pop}.dat','w');f.close()
+    for i in range(1,N_config+1):
+        L='''CELL_PARAMETERS angstrom
+    10.9338607397434711  0.0000000000000000  0.0000000000000000
+    -5.4669303698717355  9.4690011644160794  0.0000000000000000
+    0.0000000000000000  0.0000000000000000  18.3188012412753238
+
+    ATOMIC_POSITIONS angstrom
+    '''
+        stress=np.zeros((3,3))
+        with open(f'./run_dft{pop}/vasp{i}/OUTCAR') as f0:
+            d=f0.readlines()
+        with open(f'./run_dft{pop}/vasp{i}/OSZICAR') as ff:
+            dd=ff.readlines()[-1]
+
+        energy=float(dd.split()[4])/(27.211396/2)
+        for ii in range(len(d)):
+            if 'TOTAL-FORCE' in d[ii]:
+                d1=np.loadtxt(d[ii+2:ii+2+N_prim*N_supercell])
+                break
+            elif 'in kB' in d[ii]:
+                    s = np.array(d[ii].split()[2:],dtype=float)
+                    stress[0,0]=s[0];stress[1,1]=s[1];stress[2,2]=s[2];stress[0,1]=s[3];stress[1,0]=s[3]
+                    stress[1,2]=s[4];stress[2,1]=s[4];stress[0,2]=s[5];stress[2,0]=s[5]
+        pos=d1[:,:3];force=d1[:,3:]/25.71104309541616
+        stress=stress/(29421.02648438959/2*10)
+
+        #change the atom order from vasp back to QE style
+        sc=pos[:1*N_supercell];v=pos[1*N_supercell:7*N_supercell];sn=pos[7*N_supercell:13*N_supercell]
+        sc=[i for i in sc];v=[i for i in v];sn=[i for i in sn]
+        with open(f'./ens{pop}/vasp_population{pop}_{i}.dat','w') as f1:
+            f1.writelines(L)
+            for j in range(N_supercell):
+                a=sc.pop(0)
+                f1.write(f'Sc {a[0]} {a[1]} {a[2]}\n')
+                for k in range(6):
+                    a=v.pop(0)
+                    f1.write(f'V {a[0]} {a[1]} {a[2]}\n')
+                for k in range(6):
+                    a=sn.pop(0)
+                    f1.write(f'Sn {a[0]} {a[1]} {a[2]}\n')
+        sc=force[:1*N_supercell];v=force[1*N_supercell:7*N_supercell];sn=force[7*N_supercell:13*N_supercell]
+        sc=[i for i in sc];v=[i for i in v];sn=[i for i in sn]
+        with open(f'./ens{pop}/forces_population{pop}_{i}.dat','w') as f2:
+            for j in range(N_supercell):
+                a=sc.pop(0)
+                f2.write(f' {a[0]} {a[1]} {a[2]}\n')
+                for k in range(6):
+                    a=v.pop(0)
+                    f2.write(f' {a[0]} {a[1]} {a[2]}\n')
+                for k in range(6):
+                    a=sn.pop(0)
+                    f2.write(f' {a[0]} {a[1]} {a[2]}\n')
+        with open(f'./ens{pop}/pressures_population{pop}_{i}.dat','w') as f3:
+            for k in range(3):
+                f3.writelines(f'{stress[k,0]} {stress[k,1]} {stress[k,2]}\n')
+        with open(f'./ens{pop}/energies_supercell_population{pop}.dat','a') as f4:
+            f4.write(f'{energy}\n')
+
+    #check the energy file is complete
+    with open(f'./ens{pop}/energies_supercell_population{pop}.dat') as f5:
+        d=f5.readlines()
+    if len(d)!=N_config:
+        print('energy file is not complete')
+        exit()
+    E = np.array(d, dtype=float)
+    for i in range(N_config):
+        if abs(float(d[i])-np.mean(E))>abs(np.mean(E)*0.1):
+            print('energy file is not complete')
+            exit()
 
 
 def scha(pop):
@@ -151,7 +188,10 @@ def scha(pop):
 
 if __name__ == "__main__":
     pop=int(sys.argv[1])
-    collect_data(pop)
+    if os.path.exists(f"run_dft{pop}/vasp1"):
+        collect_vaspdata(pop)
+    else:
+        collect_data(pop)
     min=scha(pop)
     
 
