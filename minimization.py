@@ -76,7 +76,7 @@ def collect_vaspdata(pop,N=-1):
     index=''
     directory = f"run_dft{pop}"
     if N==-1:
-        output_filenames = [f for f in os.listdir(directory) if f.endswith(".pwo")] # We select only the output files
+        output_filenames = [f'espresso_run_{i}.pwo' for i in range(1,1+config.N_config)] # We select only the output files
         output_files = [os.path.join(directory, f) for f in output_filenames]
         energies = np.zeros(len(output_files))
     else:
