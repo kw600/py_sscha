@@ -27,7 +27,7 @@ with open('q2r.in', 'w') as f:
 os.system("q2r.x < q2r.in > q2r.out")
 
 # transform the force constant matrix into force.dat
-os.system("python qe_to_f90force.py")
+os.system("python qe_to_f90force.py ./")
 
 # generate the final QE matrix with different supercell size
 # target supercell size needs to be consistent the harmonic_xxx_dyn files in the directory
