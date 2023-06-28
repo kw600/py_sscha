@@ -14,8 +14,8 @@ target_supercell = output_dir.split('_')[-1]
 
 
 # generate the ibz.dat file for the target supercell. The delta_prim.dat file is should be generated using the input matrix, which is the next following step.
-shutil.copy(f'harmonic_{target_supercell}_dyn'+'1', output_dir+"/harmonic1")
-shutil.copy(f'harmonic_{target_supercell}_dyn'+'0', output_dir+"/harmonic0")
+shutil.copy(f'{output_dir}/harmonic_{target_supercell}_dyn'+'1', output_dir+"/harmonic1")
+shutil.copy(f'{output_dir}/harmonic_{target_supercell}_dyn'+'0', output_dir+"/harmonic0")
 os.system(f"python generate_R.py {output_dir}")
 
 # generate delta_prim.dat using generate_R.py
