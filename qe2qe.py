@@ -32,6 +32,8 @@ os.system(f"python qe_to_f90force.py {output_dir}")
 
 # generate the final QE matrix with different supercell size
 # target supercell size needs to be consistent the harmonic_xxx_dyn files in the directory
+
+# !!!!!!!!!!!!one needs to mannually change the header in farey2qe.py !!!!!!!!!!!
 os.system(f"python farey2qe.py {output_dir}")
 
 
