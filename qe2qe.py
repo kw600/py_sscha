@@ -11,8 +11,8 @@ output_dir = 'lte_881'
 output_file = 'qe2qe_881_dyn'
 
 # generate delta_prim.dat using generate_R.py
-shutil.copy(input_file+'1', output_dir+"harmonic1")
-shutil.copy(input_file+'0', output_dir+"harmonic0")
+shutil.copy(input_file+'1', output_dir+"/harmonic1")
+shutil.copy(input_file+'0', output_dir+"/harmonic0")
 os.system(f"python generate_R.py {output_dir}")
 
 # use q2r.x to get the force constant matrix
