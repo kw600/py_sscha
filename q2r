@@ -1,0 +1,12 @@
+#!/bin/bash
+module load quantum_espresso
+# rm ./$1/format2.txt
+# cp ./$1/harmonic_$1_dyn0 ./$1/${2}0
+cat > q2r.in << EOF
+&input
+ fildyn='./$1/$2',
+ zasr='simple',
+ flfrc='./$1/format2.txt'
+/
+EOF
+q2r.x < q2r.in 
