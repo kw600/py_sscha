@@ -121,7 +121,7 @@ Basis vectors
     script_dir = sys.argv[1]
     supercell = sys.argv[1].replace('/','').split('_')[-1]                
     M = np.loadtxt(script_dir + "/equilibrium.dat", dtype=np.float64, comments=['#', '$', '@'], skiprows=1, usecols=1)
-    ibz = np.loadtxt(script_dir + "/ibz.dat")
+    ibz = np.loadtxt(script_dir + "/ibz0.dat")
     ntyp, num_atoms, alat, lattice = read_header(header)
     data = np.loadtxt(script_dir + '/force.dat')
     indices = data[:, :5].astype(int) - 1  # subtract 1 to convert to 0-based indexing
