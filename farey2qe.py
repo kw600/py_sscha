@@ -1,6 +1,21 @@
 import numpy as np
 import sys
 
+def generate_dyn(k_qe, C, R, M):
+    num_cell, num_atoms, _, _, _ = C.shape
+    k_abs = k_qe/alat
+    D_q = np.zeros((num_atoms, 3, num_atoms, 3), dtype=complex)
+    for i_atom in range(num_atoms):
+        for i_cart in range(3):
+            for j_atom in range(num_atoms):
+                for j_cart in range(3):
+                    for i_cell in range(num_cell):
+                        exp_k_dot_r = 0.0
+                        for i_im in range(len(R[i_cell, i_atom, j_atom])):
+                            exp_k_dot_r += np.exp(-2j*np.pi*k_abs.dot(R[i_cell,i_atom,j_atom][i_im]))
+                        exp_k_dot_r = exp_k_dot_r / len(R[i_cell, i_atom, j_atom])
+                        D_q[i_atom, i_cart, j_atom, j_cart] += C[i_cell, i_atom, i_cart, j_atom, j_cart] * exp_k_dot_r /np.sqrt(M[i_atom]*M[j_atom])
+
 def generate_dyn_qe(k, C, R, alat):
     """
     GENERATE THE DYNAMICAL MATRIX IN QE UNITS
@@ -11,7 +26,7 @@ def generate_dyn_qe(k, C, R, alat):
     Parameters
     ----------
         k : numpy array
-            This is the q point in reduced coordinates.
+            This is the q point in reduced coordinates in QE output.
         C : numpy array
             This is the force constants in cartesian coordinates.
         R : numpy array
