@@ -1,9 +1,8 @@
 import numpy as np
 import sys
 
-def generate_dyn(k_qe, C, R, M):
+def generate_dyn(k_abs, C, R, M):
     num_cell, num_atoms, _, _, _ = C.shape
-    k_abs = k_qe/alat
     D_q = np.zeros((num_atoms, 3, num_atoms, 3), dtype=complex)
     for i_atom in range(num_atoms):
         for i_cart in range(3):
@@ -11,10 +10,14 @@ def generate_dyn(k_qe, C, R, M):
                 for j_cart in range(3):
                     for i_cell in range(num_cell):
                         exp_k_dot_r = 0.0
-                        for i_im in range(len(R[i_cell, i_atom, j_atom])):
+                        r = R[i_cell,i_atom,j_atom,:]
+                        num_image = np.count_nonzero(r != None)
+                        for i_im in range(num_image):
                             exp_k_dot_r += np.exp(-2j*np.pi*k_abs.dot(R[i_cell,i_atom,j_atom][i_im]))
                         exp_k_dot_r = exp_k_dot_r / len(R[i_cell, i_atom, j_atom])
                         D_q[i_atom, i_cart, j_atom, j_cart] += C[i_cell, i_atom, i_cart, j_atom, j_cart] * exp_k_dot_r /np.sqrt(M[i_atom]*M[j_atom])
+    
+    return D_q
 
 def generate_dyn_qe(k, C, R, alat):
     """
@@ -97,6 +100,12 @@ def output_new(q,ipath,opath,index):
         if charge:
             for ll in charge:
                 f.write(f'{ll}')
+
+def get_header(file):
+    d = open(file,'r').readlines()
+    for i in range(len(d)):
+        if 'cartesian axes' in d[i]:
+            return d[:i]
 
 def read_header(header):
     data = header.split('\n')

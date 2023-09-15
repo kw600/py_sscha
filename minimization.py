@@ -196,3 +196,68 @@ if __name__ == "__main__":
     
 
     
+
+
+def SetupFromTensor_parallel(self,id_cell2,id_cell3,tensor=None):
+        """
+        Setup the third order force constant form 3rd order tensor defined in the supercell
+        
+        
+        Parameters
+        ----------
+            unitcell_structure : Structure()
+                The structure in the unit cell
+            supercell_structure : Structure()
+                The supercell structure on which the tensor has been computed
+            supercell_size : truple
+                The number of supercell along each lattice vector
+            tensor : ndarray(size =(3*nat_sc, 3*nat_sc, 3*nat_sc, dtype = np.double)
+                The third order tensor
+        """
+
+
+        n_sup = np.prod(self.supercell_size)
+        nat = self.unitcell_structure.N_atoms
+        supercell_size = self.supercell_size
+
+
+        nat_sc= n_sup * nat
+        n_R = self.n_R
+
+        supercell_structure = self.supercell_structure
+        unitcell_structure = self.unitcell_structure
+
+
+
+        for index_cell2 in [id_cell2]:
+            n_cell_x2,n_cell_y2,n_cell_z2=Methods.one_to_three_len(index_cell2,v_min=[0,0,0],
+                                                                   v_len=supercell_size)
+            for index_cell3 in [id_cell3]:
+                n_cell_x3,n_cell_y3,n_cell_z3=Methods.one_to_three_len(index_cell3,v_min=[0,0,0],
+                                                                       v_len=supercell_size)
+                #
+                total_index_cell = index_cell3 + n_sup * index_cell2
+                #
+                self.x_r_vector2[:, total_index_cell] = (n_cell_x2, n_cell_y2, n_cell_z2)
+                self.r_vector2[:, total_index_cell] = unitcell_structure.unit_cell.T.dot(self.x_r_vector2[:,total_index_cell])
+                self.x_r_vector3[:, total_index_cell] =  n_cell_x3, n_cell_y3, n_cell_z3
+                self.r_vector3[:, total_index_cell] = unitcell_structure.unit_cell.T.dot(self.x_r_vector3[:, total_index_cell])
+
+                for na1 in range(nat):
+                    #
+                    for na2 in range(nat):
+                        # Get the atom in the supercell corresponding to the one in the unit cell
+                        na2_vect = unitcell_structure.coords[na2, :] + self.r_vector2[:, total_index_cell]
+                        nat2_sc = np.argmin( [np.sum( (supercell_structure.coords[k, :] - na2_vect)**2) for k in range(nat_sc)])
+                        #
+                        for na3 in range(nat):
+                            # Get the atom in the supercell corresponding to the one in the unit cell
+                            na3_vect = unitcell_structure.coords[na3, :] + self.r_vector3[:, total_index_cell]
+                            nat3_sc = np.argmin( [np.sum( (supercell_structure.coords[k, :] - na3_vect)**2) for k in range(nat_sc)])
+                            #
+                            self.tensor[total_index_cell,
+                                        3*na1 : 3*na1+3,
+                                        3*na2 : 3*na2+3,
+                                        3*na3 : 3*na3+3] = tensor[3*na1 : 3*na1 +3,
+                                                                3*nat2_sc : 3*nat2_sc + 3,
+                                                                3*nat3_sc : 3*nat3_sc + 3]
