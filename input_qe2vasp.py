@@ -1,7 +1,7 @@
 import os,sys
 import numpy as np
 
-qe = open(sys.argv[1],'r').readlines()
+qe = open(sys.argv[1]+'.pwi','r').readlines()
 for i in range(len(qe)):
     if 'nat' in qe[i]:
         nat = int(qe[i].split()[-1])

@@ -64,7 +64,7 @@ def read_outcar(label):
                 a = i.pop(0)
                 new_index.append(a)
     # print(new_index)
-    with open(f'{label}.pwo','w') as f:
+    with open(f'../{label}.pwo','w') as f:
         f.write(f'number of atoms/cell      =           {n_tot}\n')
         f.write('celldm(1)=   1.000000  celldm(2)=   0.000000  celldm(3)=   0.000000\n')
         f.write('celldm(4)=   0.000000  celldm(5)=   0.000000  celldm(6)=   0.000000\n\n')
@@ -90,4 +90,4 @@ def read_outcar(label):
         
         f.write('JOB DONE')
     return label, None
-# read_outcar()
+read_outcar(sys.argv[1])
