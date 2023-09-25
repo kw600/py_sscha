@@ -10,11 +10,17 @@ def read_outcar(label):
     for i in range(3):
         lattice[i] = [float(x) for x in POSCAR[i+2].split()]
     lattice /= bohr #convert to bohr
-
+    alat = float(lattice[0,0])
 
 
     n_cell = int(POSCAR[0].split()[-1])
     natom_per_type = np.array((POSCAR[6].split()),dtype=int)
+
+    pos = np.zeros((natom_per_type.sum(),3),dtype=float)
+    for i in range(natom_per_type.sum()):
+        pos[i] = [float(x) for x in POSCAR[8+i].split()[0:3]]
+    pos /= bohr #convert to bohr
+
     element = []
     for i in range(len(natom_per_type)):
         element+=natom_per_type[i]*[POSCAR[5].split()[i]]
@@ -23,7 +29,9 @@ def read_outcar(label):
 
     #read the OUTCAR
     d = open('OUTCAR','r').readlines()
-
+    if 'Voluntary' not in d[-1]:
+        print('Unfinished job')
+        exit()
     #initialize the stress tensor
     stress=np.zeros((3,3))
 
@@ -36,7 +44,7 @@ def read_outcar(label):
             stress[1,2]=s[4];stress[2,1]=s[4];stress[0,2]=s[5];stress[2,0]=s[5]
         elif 'TOTAL-FORCE' in d[i]:#read the force
             force = np.loadtxt(d[i+2:i+2+n_tot])[:,3:]/25.71103168347908 #convert eV/ang to Ry/bohr
-            pos = np.loadtxt(d[i+2:i+2+n_tot])[:,0:3]/bohr #convert ang to bohr
+            # pos = np.loadtxt(d[i+2:i+2+n_tot])[:,0:3]/bohr #convert ang to bohr
     stress1 = stress/(29421.02648438959/2*10) #convert to Ry/bohr^3   
 
     index = [i for i in range(n_tot)]
@@ -66,22 +74,22 @@ def read_outcar(label):
     # print(new_index)
     with open(f'../{label}.pwo','w') as f:
         f.write(f'number of atoms/cell      =           {n_tot}\n')
-        f.write('celldm(1)=   1.000000  celldm(2)=   0.000000  celldm(3)=   0.000000\n')
+        f.write(f'celldm(1)=   {alat:.6f}  celldm(2)=   0.000000  celldm(3)=   0.000000\n')
         f.write('celldm(4)=   0.000000  celldm(5)=   0.000000  celldm(6)=   0.000000\n\n')
         f.write('     crystal axes: (cart. coord. in units of alat)\n')
         for i in range(3):
-            f.write(f'               a({i+1}) = (   {lattice[i,0]:.16f}  {lattice[i,1]:.16f}  {lattice[i,2]:.16f} )\n')
+            f.write(f'               a({i+1}) = (   {lattice[i,0]/alat:.16f}  {lattice[i,1]/alat:.16f}  {lattice[i,2]/alat:.16f} )\n')
 
         f.write('   Cartesian axes\n\n')
         f.write('     site n.     atom                  positions (alat units)\n')
         for i in range(n_tot):
-            f.write(f'         {i+1}           {element[new_index[i]]}   tau(   {i+1}) = (   {pos[i,0]}  {pos[i,1]}   {pos[i,2]}  )\n')
+            f.write(f'         {i+1}           {element[new_index[i]]}   tau(   {i+1}) = (   {pos[new_index[i],0]/alat:.16f}  {pos[new_index[i],1]/alat:.16f}   {pos[new_index[i],2]/alat:.16f}  )\n')
 
         f.write(f'!    total energy              =   {energy} Ry\n\n')
 
         f.write('     Forces acting on atoms (cartesian axes, Ry/au):\n\n')
         for i in range(n_tot):
-            f.write(f'     atom {i+1} type {element[new_index[i]]}   force = {force[new_index[i],0]} {force[new_index[i],1]} {force[new_index[i],2]}\n')
+            f.write(f'     atom {i+1} type {element[new_index[i]]}   force = {force[new_index[i],0]:.16f} {force[new_index[i],1]:.16f} {force[new_index[i],2]:.16f}\n')
 
         f.write('\n\n')
         f.write('total   stress  (Ry/bohr**3)                   (kbar)\n')

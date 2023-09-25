@@ -13,6 +13,9 @@ for i in range(1,N_config+1):
     stress=np.zeros((3,3))
     with open(f'./run_dft{pop}/vasp{i}/OUTCAR') as f0:
         d=f0.readlines()
+    if 'Voluntary' not in d[-1]:
+        print('Unfinished job ',i)
+        exit()
     for ii in range(len(d)):
         if 'TOTAL-FORCE' in d[ii]:
             d1=np.loadtxt(d[ii+2:ii+2+N_prim*N_supercell])
