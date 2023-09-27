@@ -117,35 +117,19 @@ def read_header(header):
 
 
 if __name__=='__main__':
-    header='''Dynamical matrix file
-!ScVSn
-  3   13   0  10.3310004   0.0000000   0.0000000   0.0000000   0.0000000   0.0000000
-Basis vectors
-      1.000000000    0.000000000    0.000000000
-     -0.500000000    0.866025404    0.000000000
-      0.000000000    0.000000000    1.675419294
-           1  'Sc  '    40974.8071860994
-           2  'V   '    46430.3369103196
-           3  'Sn  '    108197.546099429
-    1    1      0.0000000000      0.0000000000      0.0000000000
-    2    2      0.5000000000      0.0000000000      0.4156210873
-    3    2     -0.2500000000      0.4330127019      0.4156210873
-    4    2      0.2500000000      0.4330127019      0.4156210873
-    5    2     -0.2500000000      0.4330127019      1.2597982066
-    6    2      0.5000000000      0.0000000000      1.2597982066
-    7    2      0.2500000000      0.4330127019      1.2597982066
-    8    3      0.0000000000      0.0000000000      1.1407148068
-    9    3      0.0000000000      0.0000000000      0.5347044871
-   10    3      0.5000000000      0.2886751346      0.0000000000
-   11    3     -0.0000000001      0.5773502692      0.0000000000
-   12    3      0.5000000000      0.2886751346      0.8377096469
-   13    3     -0.0000000001      0.5773502692      0.8377096469
-'''
-    
     script_dir = sys.argv[1]
     supercell = sys.argv[1].replace('/','').split('_')[-1]                
+
+    header = ''
+    harmonic=open(f'./{script_dir}/harmonic_{supercell}_dyn1').readlines()
+    for i in range(len(harmonic)):
+        if 'Matrix in cartesian axes' in harmonic[i]:
+            break
+        else:
+            header += harmonic[i]
+
     M = np.loadtxt(script_dir + "/equilibrium.dat", dtype=np.float64, comments=['#', '$', '@'], skiprows=1, usecols=1)
-    ibz = np.loadtxt(script_dir + "/ibz0.dat")
+    ibz = np.loadtxt(script_dir + "/ibz.dat").reshape((-1,4))
     ntyp, num_atoms, alat, lattice = read_header(header)
     data = np.loadtxt(script_dir + '/force.dat')
     indices = data[:, :5].astype(int) - 1  # subtract 1 to convert to 0-based indexing
