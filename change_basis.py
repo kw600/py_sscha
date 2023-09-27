@@ -1,38 +1,61 @@
 import numpy as np
 from ase.io import read, write
 np.set_printoptions(precision=20)
-#change basis to new_cell
-s = read('SPOSCAR')
+
+
+input_file = 'POSCAR'
+output_file = 'new_POSCAR'
+
+new_cell = '''     9.4829268542312395    0.0000000000000000    0.0000000000000000
+    -4.7414634271156197    8.2124555579939091    0.0000000000000000
+     0.0000000000000000    0.0000000000000000   18.3532012418615906'''
+
+new_cell = np.array([i.split() for i in new_cell.split('\n')],dtype=float)
+
+#use ase to read the structural information
+s = read(input_file)
 cell = s.get_cell()
 pos = s.get_positions()
 frac = s.get_scaled_positions()
 atom = s.get_chemical_symbols()
 
-a = cell[0,0];c=cell[2,2]
-new_cell = np.array([[a/2,a/2/np.sqrt(3),0],[0,a/np.sqrt(3),0],[0,0,c]])
+#mannually define the new cell and then change basis to new_cell
+
 new_frac = np.dot(pos,np.linalg.inv(new_cell))
+
+
+def shift_frac(frac):
+    for i in range(len(frac)):
+            if frac[i] < -0.0001:
+                frac[i] += 1
+            elif frac[i] >= 0.9999:
+                frac[i] -= 1
+
+    for i in range(len(frac)):
+            if frac[i] < -0.0001 or frac[i] > 0.9999:
+                frac = shift_frac(frac)
+    return frac
 
 new_s = []
 for i in range(len(new_frac)):
-    [x,y,z] = new_frac[i]
-    if x >= 0.9999 or y >= 0.9999 or z >= 0.9999:
-        # print(new_frac[i],'outside')
-        pass
-    elif x < -0.0001 or y < -0.0001 or z < -0.0001:
-        # print(new_frac[i],'outside')
-        pass
-    else:
-        # print(new_frac[i],'inside')
-        new_s.append(new_frac[i])
-print(len(new_s))
+    f = shift_frac(new_frac[i])
+    new_s.append(f)
+print('Make sure the atoms in the new cell is',len(new_s))
 
-with open('new_POSCAR','w') as f:
+old_poscar = open(input_file,'r').readlines()
+with open(output_file,'w') as f:
+    f.write(old_poscar[0])
+    f.write(old_poscar[1])
     for i in range(3):
         f.write('%.20f %.20f %.20f\n'%(new_cell[i,0],new_cell[i,1],new_cell[i,2]))
+    f.write(old_poscar[5])
+    f.write(old_poscar[6])
     for i in new_s:
         f.write('%.20f %.20f %.20f\n'%(i[0],i[1],i[2]))
 
 
+
+exit()
 #shift all the atoms up
 with open('new_POSCAR1','w') as f:
     for i in new_s:
@@ -59,21 +82,3 @@ def poscar_to_qe():
 
 
 
-def phonopy_to_vesta(eig,output,factor=1):
-    eig[:6] = eig[:6]*1.6249883295498455
-    eig=eig*factor
-    with open(output,'w') as f:
-        f.write('VECTR\n')
-        index = 1
-        for i in eig:
-            f.write('   %i    %0.6f    %0.6f    %0.6f 0\n'%(index,i[0],i[1],i[2]))
-            f.write(f'    {index}   0    0    0    0\n')
-            f.write(' 0 0 0 0 0\n')
-            index += 1
-        f.write(' 0 0 0 0 0\n')
-        f.write('VECTT\n')
-        index = 1
-        for i in range(len(eig)):
-            f.write(f'   {index}  0.500 255   0   0 0\n')
-            index += 1
-        f.write(' 0 0 0 0 0\n')
