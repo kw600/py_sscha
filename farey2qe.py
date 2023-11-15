@@ -84,7 +84,7 @@ def output_new(q,ipath,opath,index):
         for i in range(len(q)):
             D = generate_dyn_qe(q[i] , C, R, alat)
             D_real = np.real(D); D_imag = np.imag(D)
-            f.write('\n     Dynamical  Matrix in cartesian axes\n')
+            f.write('     Dynamical  Matrix in cartesian axes\n')
             f.write('\n')
             f.write(f'     q = ( {q[i][0]} {q[i][1]} {q[i][2]} )\n')
             f.write('\n')
