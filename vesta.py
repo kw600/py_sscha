@@ -1,3 +1,8 @@
+import cellconstructor as CC
+import cellconstructor.Structure
+import cellconstructor.Phonons
+import sscha, sscha.Ensemble, sscha.SchaMinimizer, sscha.Relax
+import sys,os
 import numpy as np
 import phonopy
 
@@ -31,6 +36,26 @@ def read_eig(nmode):
     mass=p.get_unitcell().get_masses()
     return eig,mass
 
+def generate_supercelldyn():
+    try:
+        p=phonopy.load(f"phonopy.yaml",force_constants_filename=f'FORCE_CONSTANTS')
+    except:
+        p=phonopy.load(f"phonopy.yaml",force_constants_filename=f'FORCE_SETS')
+    s = CC.Methods.sscha_phonons_from_phonopy(p)
+    s1 = s.GenerateSupercellDyn(s.GetSupercell())
+    s1.save_qe('Gamma_dyn')
+
+def read_eig_new(nmode):
+    f = open('Gamma_dyn1','r').readlines()
+    natom=int(f[2].split()[1])
+    dis = np.zeros((natom,3))
+    for i in range(len(f)):
+        key = 'freq ('+'%5i' % (nmode+1)+')'
+        if key in f[i]:
+            for j in range(natom):
+                dis[j] = np.array(f[i+j+1].split()[1:6:2])
+    return dis
+
 def generate_dis(eig,mass,factor):
     for i in range(len(eig)):
         eig[i] = eig[i]/np.sqrt(mass[i])
@@ -39,13 +64,13 @@ def generate_dis(eig,mass,factor):
 def output_vesta(input_file,output_file,nmode=0):
     with open(input_file,'r') as f1:
         d = f1.readlines()
-    
+
     with open(output_file,'w') as f2:
         for i in range(len(d)):
             if 'VECTR' in d[i]:
-                id1 = i 
+                id1 = i
             elif 'SPLAN' in d[i]:
-                id2 = i 
+                id2 = i
                 break
         write=True
         for i in range(len(d)):
@@ -53,33 +78,20 @@ def output_vesta(input_file,output_file,nmode=0):
                 f2.write(d[i])
             else:
                 if write == True:
-                    
-                    eig0,mass = read_eig(0)
-                    eig1,mass = read_eig(1)
-                    f0=0;f1=1.5
-                    eig = (f0*eig0+f1*eig1)/np.sqrt(f1**2+f0**2)
-                    
-                    # eig,mass = read_eig(1)
-                    dis = generate_dis(eig,mass,1)
-                    print(dis)
-                    dis1 = np.zeros(dis.shape)
-                    for m in range(len(dis1)):
-                        for n in range(len(dis1[0])):
-                            if np.abs(dis[m,n])>1e-2:
-                                dis1[m,n] = dis[m,n]
-                    print(dis1)
-                    np.save('dis1.5.npy',dis1)
-                    # print(dis)
-                    write_dis_vesta(dis1*100,f2)
-                    write = False 
+
+                    #eig0,mass = read_eig(0)
+                    #eig1,mass = read_eig(1)
+                    #f0=0;f1=1
+                    #eig = (f0*eig0+f1*eig1)/np.sqrt(f1**2+f0**2)
+                    dis = read_eig_new(nmode)
+
+                    write_dis_vesta(dis*10,f2)
+                    write = False
 
 if __name__=="__main__":
-        nmode = 0
-        input_file  = '332.vesta'
-        output_file = f'332-test.vesta'
-        
+    generate_supercelldyn()
+    for nmode in range(4):
+        input_file  = '333.vesta'
+        output_file = f'333.{nmode}.vesta'
+
         output_vesta(input_file,output_file,nmode)
-
-
-        
-
