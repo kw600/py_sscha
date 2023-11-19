@@ -6,6 +6,8 @@ import sys,os
 import numpy as np
 import phonopy
 
+from vesta import *
+
 np.set_printoptions(precision=20)
 
 def generate_vasp_input(pop):
@@ -22,10 +24,10 @@ def generate_vasp_input(pop):
         if not os.path.exists(f"run_dft{pop}/vasp{number}"):
             os.mkdir(f"run_dft{pop}/vasp{number}")
         filename = os.path.join(f"run_dft{pop}/vasp{number}", "POSCAR".format(number))
-        
+
         # We start writing the file
         with open(filename, "w") as f:
-            
+
             # Load the scf_population_X.dat file
             ff = open(file, "r")
             structure_lines = ff.readlines()
@@ -123,9 +125,10 @@ Direct
             # print(new_frac)
             f1.write("  %10.20f %10.20f %10.20f \n" % (new_frac[0],new_frac[1],new_frac[2]))
 
-def quadratic_from_dis(output_file,factor=1):
-    dis = np.load('dis1.5.npy')
+def quadratic_from_dis(output_file,nmode,factor=1):
+    #dis = np.load('dis1.5.npy')
     # print(np.max(dis))
+    dis = read_eig_new(nmode)
     d = open('POSCAR','r').readlines()
     with open(output_file,'w') as f1:
         for i in range(8):
@@ -162,65 +165,10 @@ def mannually_displace(prim_cell,prim_pos,eig,supercell=[3,3,3]):
             for l in range(len(sup_pos)):
                     f1.write("%s %10.20f %10.20f %10.20f \n" % (atom[l],p[l,0],p[l,1],p[l,2]))
 
-def generate_castep_ph():
-    num_cell = supercell[0]*supercell[1]*supercell[2]
-    cell_id = np.zeros((supercell[0],supercell[1],supercell[2]))
-    sup_atom = np.zeros((num_cell,len(prim_pos)))
-    sup_mass = np.zeros((num_cell,len(prim_pos)))
-    sup_cell = np.array([prim_cell[i]*supercell[i] for i in range(3)])
-    atom=['Sc']+['V']*6+['Sn']*6
-    mass=[44.95591]+[50.9414]*6+[118.70999]*6
-    id = 0
-    for i in range(supercell[0]):
-        for j in range(supercell[1]):
-            for k in range(supercell[2]):
-                cell_id[i,j,k] = id
-                id += 1
-    header=''' BEGIN header
- Number of ions         351
- Number of branches     1053
- Number of wavevectors  1
- Frequencies in         cm-1
- IR intensities in      (D/A)**2/amu
- Raman activities in    A**4 amu**(-1)
- Unit cell vectors (A)
-       16.40079111   0.            0.        
-      -8.20039555    14.20350175   0.        
-       0.            0.            27.47820186
- Fractional Co-ordinates
- '''
-    header2=''' END header
-     q-pt=    1   0 0 0      1
-       1      -22
-       2      67.917047
-       3     179.176230
-                        Phonon Eigenvectors
-Mode Ion                X                                   Y                                   Z
-'''
-    with open('p2.phonon','w') as f:
-        f.write(header)
-        count=1
-        for cell in range(num_cell):
-            [i,j,k] = np.where(cell_id==cell)
-            sup_pos = prim_pos+i*prim_cell[0]+j*prim_cell[1]+k*prim_cell[2]
-            sup_f = np.dot(sup_pos,np.linalg.inv(sup_cell))
-            for l in range(len(sup_pos)):
-                f.write(f'{count} {sup_f[l,0]} {sup_f[l,1]} {sup_f[l,2]} {atom[l]} {mass[l]}\n')
-                count+=1
-    
-        f.write(header2)
-        count=1
-        for cell in range(num_cell):
-            [i,j,k] = np.where(cell_id==cell)
-            dis = eig*np.exp(1j*2*np.pi*(i/supercell[0]+j/supercell[1]+k/supercell[2]))
-            for l in range(len(sup_pos)):
-                f.write("1 %i %.4f %.4f %.4f %.4f %.4f %.4f\n" % (count,dis[l,0],0,dis[l,1],0,dis[l,2],0))
-                count+=1
-
 
 if __name__=="__main__":
-    for i in range(0,6):
-        factor = i
-        output_file = f'displace/vasp{factor}/POSCAR'
-        quadratic_from_dis(output_file,factor)
-
+    for i in range(0,2):
+        factor = i/10
+        for nmode in range(4):
+            output_file = f'./mode{nmode}/POSCAR-{nmode}-{i}'
+            quadratic_from_dis(output_file,nmode,factor)
